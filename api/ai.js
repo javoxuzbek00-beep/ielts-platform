@@ -13,7 +13,7 @@ export default async function handler(req, res) {
 
   const rawKey = process.env.GEMINI_API_KEY;
   if (!rawKey) {
-    return res.status(500).json({ error: 'GEMINI_API_KEY topilmadi' });
+    return res.status(500).json({ error: 'Vercel sozlamalarida GEMINI_API_KEY topilmadi' });
   }
   const apiKey = rawKey.trim().replace(/^["']|["']$/g, '');
 
@@ -91,44 +91,29 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Noto\'g\'ri so\'rov turi' });
     }
 
+    // Google xabarida so'ralgan rasmiy model: gemini-3.8-flash
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
 
-    // High demand bo'lsa avtomatik 3 martagacha qayta urunish (Retry)
-    let lastError = null;
-    const maxRetries = 3;
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
 
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        const response = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
+    const data = await response.json();
 
-        const data = await response.json();
-
-        if (response.ok && data?.candidates?.[0]?.content?.parts?.[0]?.text) {
-          const rawText = data.candidates[0].content.parts[0].text;
-          const cleanJson = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
-          const result = JSON.parse(cleanJson);
-          return res.status(200).json(result);
-        }
-
-        lastError = data?.error?.message || `Server javob bermadi (${response.status})`;
-
-        // Agar server band bo'lsa (high demand), 1.5 soniya kutib qayta yuboradi
-        if (attempt < maxRetries) {
-          await new Promise(res => setTimeout(res, 1500));
-        }
-      } catch (err) {
-        lastError = err.message;
-        if (attempt < maxRetries) {
-          await new Promise(res => setTimeout(res, 1500));
-        }
-      }
+    if (!response.ok || data.error) {
+      return res.status(500).json({ error: data?.error?.message || 'Gemini xatoligi' });
     }
 
-    return res.status(500).json({ error: lastError || 'AI server band, qayta urining' });
+    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!rawText) {
+      return res.status(500).json({ error: 'AI javob qaytara olmadi' });
+    }
+
+    const cleanJson = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
+    const result = JSON.parse(cleanJson);
+    return res.status(200).json(result);
 
   } catch (error) {
     return res.status(500).json({ error: error.message });
