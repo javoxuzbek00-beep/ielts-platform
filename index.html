@@ -43,10 +43,11 @@
       </div>
       <div>
         <h1 class="text-xl font-extrabold tracking-tight">IELTS MASTER BOOSTER</h1>
-        <p class="text-xs text-slate-400">Autentik materiallar va AI ekotizimi</p>
+        <p class="text-xs text-slate-400">Autentik materiallar va AI Lug'at Ekotizimi</p>
       </div>
     </div>
 
+    <!-- Streak va Progress -->
     <div class="flex items-center gap-4 bg-slate-900/80 border border-slate-800 px-4 py-2 rounded-2xl backdrop-blur-md">
       <div class="flex items-center gap-2">
         <span class="text-orange-500 text-lg"><i class="fa-solid fa-fire"></i></span>
@@ -66,24 +67,21 @@
     </div>
   </header>
 
-  <!-- Navigatsiya -->
+  <!-- Navigatsiya: Faqat 2 ta asosiy bo'lim -->
   <main class="max-w-6xl mx-auto mt-8">
     <div class="flex items-center justify-center gap-3 mb-8">
-      <button onclick="switchTab('vocab')" id="tab-vocab" class="px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 bg-blue-600 text-white shadow-lg shadow-blue-600/30">
+      <button onclick="switchTab('vocab')" id="tab-vocab" class="px-7 py-3 rounded-xl font-bold text-sm transition-all duration-300 bg-blue-600 text-white shadow-lg shadow-blue-600/30">
         <i class="fa-solid fa-gamepad mr-2"></i> 7 ta Vocabulary O'yinlari
       </button>
-      <button onclick="switchTab('scanner')" id="tab-scanner" class="px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 bg-slate-800/80 hover:bg-slate-800 text-slate-300">
+      <button onclick="switchTab('scanner')" id="tab-scanner" class="px-7 py-3 rounded-xl font-bold text-sm transition-all duration-300 bg-slate-800/80 hover:bg-slate-800 text-slate-300">
         <i class="fa-solid fa-camera mr-2"></i> Reading Rasm Skaner (AI)
-      </button>
-      <button onclick="switchTab('speaking')" id="tab-speaking" class="px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 bg-slate-800/80 hover:bg-slate-800 text-slate-300">
-        <i class="fa-solid fa-microphone-lines mr-2"></i> Speaking with Maya (AI)
       </button>
     </div>
 
-    <!-- 1. VOCABULARY BO'LIMI -->
+    <!-- 1. VOCABULARY BO'LIMI (7 TA MINI O'YIN) -->
     <section id="section-vocab" class="space-y-6">
       
-      <!-- 7 ta karta -->
+      <!-- O'yinlar kartalari -->
       <div id="games-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- 1. Flashcards -->
         <div onclick="startGame('flashcards')" class="cursor-pointer group relative bg-gradient-to-b from-blue-900/40 to-slate-900/90 border border-blue-500/20 hover:border-blue-500 p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1 shadow-xl">
@@ -207,7 +205,7 @@
       </div>
     </section>
 
-    <!-- 2. READING RASM SKANER -->
+    <!-- 2. READING RASM SKANER (AI VISION) -->
     <section id="section-scanner" class="hidden space-y-6">
       <div class="bg-slate-900/80 border border-slate-800 p-6 md:p-8 rounded-3xl">
         <div class="max-w-2xl mx-auto text-center space-y-4">
@@ -216,7 +214,7 @@
           </div>
           <h2 class="text-2xl font-black">Cambridge Reading Sahifasini Yuklang</h2>
           <p class="text-sm text-slate-400">
-            Kitobdan sahifani rasmga oling. Sun'iy intellekt matndagi B2/C1 akademik so'zlarni ajratib, 7 ta mini-o'yinga joylaydi.
+            Kitobdan sahifani rasmga oling. Sun'iy intellekt matndagi barcha B2/C1 darajadagi akademik so'zlar va iboralarni bir zumda ajratib, 7 ta o'yinga joylaydi.
           </p>
 
           <div class="pt-4">
@@ -239,64 +237,9 @@
       </div>
     </section>
 
-    <!-- 3. SPEAKING WITH MAYA -->
-    <section id="section-speaking" class="hidden space-y-6">
-      <div class="bg-slate-900/80 border border-slate-800 p-6 md:p-8 rounded-3xl">
-        <div class="max-w-2xl mx-auto space-y-6">
-          <div class="flex items-center gap-4">
-            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-pink-500 to-rose-600 flex items-center justify-center text-2xl font-bold shadow-lg shadow-pink-500/20">
-              <i class="fa-solid fa-robot"></i>
-            </div>
-            <div>
-              <h2 class="text-xl font-black">Maya — IELTS Speaking Imtihon Oluvchi</h2>
-              <p class="text-xs text-slate-400">Part 1, 2, 3 bo'yicha jonli tahlil va Band 8.5 rephrasing</p>
-            </div>
-          </div>
-
-          <div class="bg-slate-950/70 border border-slate-800 p-5 rounded-2xl">
-            <p class="text-xs uppercase font-bold text-pink-400 mb-1">Imtihon Savoli:</p>
-            <h3 id="speaking-question" class="text-lg font-bold text-white">Do you think artificial intelligence will change the way students learn languages?</h3>
-            <button onclick="playTTS(document.getElementById('speaking-question').innerText)" class="mt-2 text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5">
-              <i class="fa-solid fa-volume-high text-pink-400"></i> Savolni eshitish
-            </button>
-          </div>
-
-          <div class="flex flex-col items-center justify-center gap-3 py-4">
-            <button id="mic-btn" onclick="toggleRecording()" class="w-20 h-20 rounded-full bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center text-2xl shadow-xl shadow-rose-600/30 transition transform active:scale-95">
-              <i id="mic-icon" class="fa-solid fa-microphone"></i>
-            </button>
-            <p id="mic-status" class="text-xs text-slate-400 font-semibold">Javob berish uchun mikrofonni bosing</p>
-          </div>
-
-          <div class="space-y-2">
-            <label class="text-xs font-bold text-slate-400">Sizning Javobingiz (Transkripsiya):</label>
-            <textarea id="speech-transcript" rows="3" class="w-full bg-slate-950/90 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-rose-500 transition" placeholder="Mikrofonni yoqib gapiring yoki javobingizni yozing..."></textarea>
-          </div>
-
-          <button id="submit-speech-btn" onclick="submitSpeechAnswer()" class="w-full py-3.5 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 font-bold rounded-xl shadow-lg transition">
-            Javobni Mayaga Yuborish & Baholash
-          </button>
-
-          <div id="maya-feedback-box" class="hidden bg-slate-950 border border-slate-800 p-6 rounded-2xl space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-              <span class="text-sm font-bold text-slate-300">Maya Natijasi:</span>
-              <span id="maya-band" class="px-3 py-1 bg-pink-500/20 text-pink-400 border border-pink-500/30 font-black rounded-lg text-sm">Band 7.0</span>
-            </div>
-            <div>
-              <p class="text-xs text-slate-400 font-bold uppercase mb-1">Xatolar va Tavsiya:</p>
-              <p id="maya-comment" class="text-sm text-slate-200 leading-relaxed"></p>
-            </div>
-            <div>
-              <p class="text-xs text-slate-400 font-bold uppercase mb-1">Band 8.5 Native Rephrase:</p>
-              <p id="maya-rephrase" class="text-sm text-emerald-400 italic bg-emerald-950/20 p-3 rounded-xl border border-emerald-500/20"></p>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
   </main>
 
+  <!-- JAVASCRIPT LOGIKASI -->
   <script>
     let vocabularyDeck = [
       {
@@ -378,15 +321,15 @@
     }
 
     function switchTab(tab) {
-      ['vocab', 'scanner', 'speaking'].forEach(t => {
+      ['vocab', 'scanner'].forEach(t => {
         document.getElementById(`section-${t}`).classList.add('hidden');
-        document.getElementById(`tab-${t}`).className = 'px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 bg-slate-800/80 hover:bg-slate-800 text-slate-300';
+        document.getElementById(`tab-${t}`).className = 'px-7 py-3 rounded-xl font-bold text-sm transition-all duration-300 bg-slate-800/80 hover:bg-slate-800 text-slate-300';
       });
       document.getElementById(`section-${tab}`).classList.remove('hidden');
-      document.getElementById(`tab-${tab}`).className = 'px-6 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 bg-blue-600 text-white shadow-lg shadow-blue-600/30';
+      document.getElementById(`tab-${tab}`).className = 'px-7 py-3 rounded-xl font-bold text-sm transition-all duration-300 bg-blue-600 text-white shadow-lg shadow-blue-600/30';
     }
 
-    // O'YINLAR BOSHQARUVI
+    // O'yinlar boshqaruvi
     let currentGame = '';
     let gameIndex = 0;
     let score = 0;
@@ -489,7 +432,7 @@
       renderGame();
     }
 
-    // 2. Multiple Choice (Index asosida, tutuq belgilari xato bermaydi)
+    // 2. Multiple Choice
     let currentChoices = [];
     let currentCorrectIdx = 0;
     function renderMultipleChoice(stage, stats) {
@@ -768,7 +711,7 @@
       }
     }
 
-    // RASM SKANER (Kompressiya bilan)
+    // READING RASM SKANER (Avtomatik siqish bilan)
     function compressImage(file, callback) {
       const reader = new FileReader();
       reader.onload = function(e) {
@@ -815,7 +758,6 @@
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              type: 'reading',
               image: optimizedBase64
             })
           });
@@ -826,7 +768,7 @@
           if (Array.isArray(data) && data.length > 0) {
             vocabularyDeck = data;
             document.getElementById('total-words-badge').innerText = `${vocabularyDeck.length} ta so'z`;
-            alert(`Ajoyib! Matndan ${data.length} ta B2/C1 darajadagi so'zlar ajratib olindi va 7 ta mini-o'yinga joylandi!`);
+            alert(`Ajoyib! Matndan ${data.length} ta B2/C1 darajadagi so'zlar ajratib olindi va 7 ta mini-o'yinga yuklandi!`);
             switchTab('vocab');
           }
         } catch (err) {
@@ -835,92 +777,6 @@
           document.getElementById('scan-loading-text').classList.add('hidden');
         }
       });
-    }
-
-    // SPEAKING WITH MAYA
-    let recognition = null;
-    let isRecording = false;
-
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.lang = 'en-US';
-
-      recognition.onresult = (event) => {
-        let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          transcript += event.results[i][0].transcript;
-        }
-        document.getElementById('speech-transcript').value = transcript;
-      };
-
-      recognition.onerror = () => { stopRecording(); };
-    }
-
-    function toggleRecording() {
-      if (!recognition) {
-        alert("Brauzeringiz ovozni aniqlashni qo'llab-quvvatlamaydi (Google Chrome tavsiya etiladi).");
-        return;
-      }
-      if (!isRecording) {
-        recognition.start();
-        isRecording = true;
-        document.getElementById('mic-btn').classList.add('animate-pulse', 'ring-4', 'ring-rose-500');
-        document.getElementById('mic-status').innerText = "Eshityapman... To'xtatish uchun yana bosing";
-      } else {
-        stopRecording();
-      }
-    }
-
-    function stopRecording() {
-      if (recognition && isRecording) {
-        recognition.stop();
-        isRecording = false;
-        document.getElementById('mic-btn').classList.remove('animate-pulse', 'ring-4', 'ring-rose-500');
-        document.getElementById('mic-status').innerText = "Ovoz yozildi. Baholash tugmasini bosing";
-      }
-    }
-
-    async function submitSpeechAnswer() {
-      const question = document.getElementById('speaking-question').innerText;
-      const answer = document.getElementById('speech-transcript').value.trim();
-
-      if (!answer) {
-        alert("Iltimos, avval mikrofon orqali gapiring yoki javobingizni yozing!");
-        return;
-      }
-
-      const btn = document.getElementById('submit-speech-btn');
-      btn.innerText = "Maya tahlil qilmoqda...";
-      btn.disabled = true;
-
-      try {
-        const response = await fetch('/api/ai', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            type: 'speaking',
-            question: question,
-            answer: answer
-          })
-        });
-
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || 'Xatolik');
-
-        document.getElementById('maya-feedback-box').classList.remove('hidden');
-        document.getElementById('maya-band').innerText = `Band ${result.band}`;
-        document.getElementById('maya-comment').innerText = result.feedback;
-        document.getElementById('maya-rephrase').innerText = `"${result.native_rephrase}"`;
-
-      } catch (err) {
-        alert("Xatolik: " + err.message);
-      } finally {
-        btn.innerText = "Javobni Mayaga Yuborish & Baholash";
-        btn.disabled = false;
-      }
     }
   </script>
 </body>
