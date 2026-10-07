@@ -20,6 +20,29 @@ export default async function handler(req, res) {
   const { type, image, question, answer } = req.body;
 
   try {
+    // 1. Google'dan sizning kalitingizda aynan qaysi modellar faolligini olamiz
+    const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+    const listData = await listRes.json();
+
+    if (!listRes.ok || listData.error) {
+      return res.status(500).json({
+        error: `Google API xatosi: ${listData?.error?.message || 'Kalit tekshirilmadi'}`
+      });
+    }
+
+    const models = listData.models || [];
+    // generateContent'ni qo'llab-quvvatlaydigan modellarni saralaymiz
+    const usableModels = models.filter(m => m.supportedGenerationMethods?.includes('generateContent'));
+
+    if (usableModels.length === 0) {
+      return res.status(500).json({ error: 'Ushbu kalitda generateContent model topilmadi' });
+    }
+
+    // Birinchi o'rinda Flash modelini, bo'lmasa mavjud birinchisini tanlaymiz
+    const selectedModel = usableModels.find(m => m.name.toLowerCase().includes('flash')) || usableModels[0];
+    const modelPath = selectedModel.name; // masalan: "models/gemini-2.0-flash" yoki "models/gemini-flash-latest"
+
+    // 2. So'rov matnini tayyorlash
     let payload;
 
     if (type === 'reading') {
@@ -61,9 +84,7 @@ export default async function handler(req, res) {
             }
           ]
         }],
-        generationConfig: {
-          responseMimeType: "application/json"
-        }
+        generationConfig: { responseMimeType: "application/json" }
       };
 
     } else if (type === 'speaking') {
@@ -87,46 +108,35 @@ export default async function handler(req, res) {
           role: "user",
           parts: [{ text: prompt }]
         }],
-        generationConfig: {
-          responseMimeType: "application/json"
-        }
+        generationConfig: { responseMimeType: "application/json" }
       };
     } else {
       return res.status(400).json({ error: 'Noto\'g\'ri so\'rov turi' });
     }
 
-    // Google'ning eng so'nggi tezkor modellari ro'yxati (Ketma-ket sinab ko'radi)
-    const availableModels = ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-2.0-flash-exp'];
-    let lastError = null;
+    // 3. Google ro'yxatidan olingan aniq modelga so'rov yuborish
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/${modelPath}:generateContent?key=${apiKey}`;
+    const genRes = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
 
-    for (const model of availableModels) {
-      try {
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-        const response = await fetch(endpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await response.json();
-
-        if (response.ok && data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-          const rawText = data.candidates[0].content.parts[0].text;
-          const cleanJson = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
-          const result = JSON.parse(cleanJson);
-          return res.status(200).json(result);
-        } else {
-          lastError = data?.error?.message || `Xatolik (${model})`;
-        }
-      } catch (err) {
-        lastError = err.message;
-      }
+    const genData = await genRes.json();
+    if (!genRes.ok || genData.error) {
+      return res.status(500).json({ error: genData?.error?.message || 'AI tahlilida xatolik yuz berdi' });
     }
 
-    return res.status(500).json({ error: lastError || 'Barcha AI modellar band' });
+    const rawText = genData.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!rawText) {
+      return res.status(500).json({ error: 'AI javob qaytara olmadi' });
+    }
+
+    const cleanJson = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
+    const result = JSON.parse(cleanJson);
+    return res.status(200).json(result);
 
   } catch (error) {
-    console.error("AI Error:", error);
-    return res.status(500).json({ error: 'Server xatoligi: ' + error.message });
+    return res.status(500).json({ error: 'Xatolik: ' + error.message });
   }
 }
