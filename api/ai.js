@@ -15,11 +15,9 @@ export default async function handler(req, res) {
   if (!rawKey) {
     return res.status(500).json({ error: 'Vercel sozlamalarida GEMINI_API_KEY topilmadi' });
   }
-  // Kalitdagi har qanday ortiqcha bo'sh joy yoki belgilarni tozalash
   const apiKey = rawKey.trim().replace(/^["']|["']$/g, '');
 
   const { type, image, question, answer } = req.body;
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
   try {
     let payload;
@@ -97,32 +95,38 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Noto\'g\'ri so\'rov turi' });
     }
 
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+    // Google'ning eng so'nggi tezkor modellari ro'yxati (Ketma-ket sinab ko'radi)
+    const availableModels = ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-2.0-flash-exp'];
+    let lastError = null;
 
-    const data = await response.json();
+    for (const model of availableModels) {
+      try {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
 
-    // Agar Google rad etsa, Google'ning asl xato xabarini qaytaramiz
-    if (!response.ok) {
-      const errorMsg = data?.error?.message || `Google API xatosi (${response.status})`;
-      return res.status(500).json({ error: errorMsg, details: data });
+        const data = await response.json();
+
+        if (response.ok && data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+          const rawText = data.candidates[0].content.parts[0].text;
+          const cleanJson = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
+          const result = JSON.parse(cleanJson);
+          return res.status(200).json(result);
+        } else {
+          lastError = data?.error?.message || `Xatolik (${model})`;
+        }
+      } catch (err) {
+        lastError = err.message;
+      }
     }
 
-    if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
-      const finishReason = data?.candidates?.[0]?.finishReason || 'Javob bo\'sh qaytdi';
-      return res.status(500).json({ error: `AI tahlil qila olmadi (Sabab: ${finishReason})`, details: data });
-    }
-
-    const rawText = data.candidates[0].content.parts[0].text;
-    const cleanJson = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
-    const result = JSON.parse(cleanJson);
-    return res.status(200).json(result);
+    return res.status(500).json({ error: lastError || 'Barcha AI modellar band' });
 
   } catch (error) {
     console.error("AI Error:", error);
-    return res.status(500).json({ error: 'Xatolik: ' + error.message });
+    return res.status(500).json({ error: 'Server xatoligi: ' + error.message });
   }
 }
