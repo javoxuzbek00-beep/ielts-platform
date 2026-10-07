@@ -66,28 +66,50 @@ export default async function handler(req, res) {
       }
     };
 
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
+    // Google'ning eng so'nggi 3-avlod modellari zanjiri
+    // Biri band (High demand) bo'lsa, zudlik bilan keyingisiga o'tadi
+    const modelsChain = [
+      'gemini-3.8-flash',
+      'gemini-3.1-flash-lite',
+      'gemini-3.7-flash',
+      'gemini-3-flash-preview'
+    ];
 
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+    let lastError = null;
 
-    const data = await response.json();
+    for (const model of modelsChain) {
+      try {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
 
-    if (!response.ok || data.error) {
-      return res.status(500).json({ error: data?.error?.message || 'Gemini tahlil qila olmadi' });
+        const data = await response.json();
+
+        // Muvaffaqiyatli javob kelsa — darhol foydalanuvchiga qaytaramiz
+        if (response.ok && data?.candidates?.[0]?.content?.parts?.[0]?.text) {
+          const rawText = data.candidates[0].content.parts[0].text;
+          const cleanJson = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
+          const result = JSON.parse(cleanJson);
+          return res.status(200).json(result);
+        }
+
+        const msg = data?.error?.message || '';
+        lastError = msg;
+
+        // Agar bu model band (high demand) yoki topilmagan bo'lsa, kutmasdan keyingisiga o'tamiz
+        if (msg.includes('high demand') || msg.includes('overloaded') || response.status === 503 || response.status === 404) {
+          continue;
+        }
+
+      } catch (err) {
+        lastError = err.message;
+      }
     }
 
-    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!rawText) {
-      return res.status(500).json({ error: 'AI bo\'sh javob qaytardi' });
-    }
-
-    const cleanJson = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
-    const result = JSON.parse(cleanJson);
-    return res.status(200).json(result);
+    return res.status(500).json({ error: lastError || 'Barcha AI serverlar band, 1 daqiqadan so\'ng qayta urining' });
 
   } catch (error) {
     return res.status(500).json({ error: error.message });
