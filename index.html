@@ -3,20 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IELTS Master Platform</title>
+  <title>IELTS Vocabulary Arena Pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Cabinet+Grotesk:wght@800;900&display=swap');
+    
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background: radial-gradient(circle at 50% 0%, #1e293b 0%, #0b0f19 100%);
+      background: radial-gradient(circle at 50% 0%, #0f172a 0%, #020617 100%);
       min-height: 100vh;
       color: #f8fafc;
     }
-    .card-flip { perspective: 1000px; }
+    .heading-font {
+      font-family: 'Cabinet Grotesk', sans-serif;
+    }
+    .card-flip { perspective: 1200px; }
     .card-inner {
-      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
       transform-style: preserve-3d;
     }
     .card-inner.flipped { transform: rotateY(180deg); }
@@ -25,212 +29,279 @@
       -webkit-backface-visibility: hidden;
     }
     .card-back { transform: rotateY(180deg); }
-    .scanner-line { animation: scan 2s infinite ease-in-out; }
-    @keyframes scan {
-      0% { top: 0%; opacity: 0.8; }
-      50% { top: 90%; opacity: 1; }
-      100% { top: 0%; opacity: 0.8; }
+
+    .scanner-line {
+      animation: scan 2s infinite ease-in-out;
     }
+    @keyframes scan {
+      0% { top: 5%; opacity: 0.9; }
+      50% { top: 92%; opacity: 1; }
+      100% { top: 5%; opacity: 0.9; }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+    .animate-shake { animation: shake 0.35s ease-in-out; }
+
+    @keyframes pop {
+      0% { transform: scale(0.9); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .animate-pop { animation: pop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
   </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-3 sm:p-6 md:p-8 select-none">
 
-  <!-- Header -->
-  <header class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-800">
-    <div class="flex items-center gap-3">
-      <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-xl font-bold shadow-lg shadow-blue-500/20">
-        <i class="fa-solid fa-graduation-cap"></i>
+  <!-- Yuqori Header -->
+  <header class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-800/80">
+    <div class="flex items-center gap-3.5">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-violet-500 flex items-center justify-center text-xl font-bold shadow-lg shadow-indigo-500/25">
+        <i class="fa-solid fa-bolt-lightning text-amber-300"></i>
       </div>
       <div>
-        <h1 class="text-xl font-extrabold tracking-tight">IELTS MASTER BOOSTER</h1>
-        <p class="text-xs text-slate-400">Autentik materiallar va AI Lug'at Ekotizimi</p>
+        <h1 class="text-xl font-black tracking-tight flex items-center gap-2">
+          IELTS VOCAB ARENA <span class="px-2 py-0.5 text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-md font-bold">PRO</span>
+        </h1>
+        <p class="text-xs text-slate-400">Autentik matnlar & O'ta yuqori retention tizimi</p>
       </div>
     </div>
 
-    <!-- Streak va Progress -->
-    <div class="flex items-center gap-4 bg-slate-900/80 border border-slate-800 px-4 py-2 rounded-2xl backdrop-blur-md">
+    <!-- Gamifikatsiya Statistikalari -->
+    <div class="flex items-center gap-3 bg-slate-900/90 border border-slate-800/80 px-4 py-2 rounded-2xl backdrop-blur-md shadow-xl">
       <div class="flex items-center gap-2">
-        <span class="text-orange-500 text-lg"><i class="fa-solid fa-fire"></i></span>
-        <div class="text-left">
-          <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Streak</p>
-          <p class="text-sm font-extrabold text-orange-400">6 Kun</p>
+        <i class="fa-solid fa-gem text-indigo-400 text-sm"></i>
+        <div>
+          <p class="text-[9px] text-slate-400 uppercase font-black tracking-wider">XP Ball</p>
+          <p id="hud-xp" class="text-xs font-black text-white">450 XP</p>
         </div>
       </div>
       <div class="h-6 w-px bg-slate-800"></div>
       <div class="flex items-center gap-2">
-        <span class="text-emerald-400 text-lg"><i class="fa-solid fa-chart-line"></i></span>
-        <div class="text-left">
-          <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Consistency</p>
-          <p class="text-sm font-extrabold text-emerald-400">86%</p>
+        <i class="fa-solid fa-fire text-orange-500 text-base animate-pulse"></i>
+        <div>
+          <p class="text-[9px] text-slate-400 uppercase font-black tracking-wider">Streak</p>
+          <p class="text-xs font-black text-orange-400">6 Kun</p>
+        </div>
+      </div>
+      <div class="h-6 w-px bg-slate-800"></div>
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-bullseye text-emerald-400 text-sm"></i>
+        <div>
+          <p class="text-[9px] text-slate-400 uppercase font-black tracking-wider">Aniqlik</p>
+          <p id="hud-acc" class="text-xs font-black text-emerald-400">92%</p>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- Navigatsiya: Faqat 2 ta asosiy bo'lim -->
-  <main class="max-w-6xl mx-auto mt-8">
-    <div class="flex items-center justify-center gap-3 mb-8">
-      <button onclick="switchTab('vocab')" id="tab-vocab" class="px-7 py-3 rounded-xl font-bold text-sm transition-all duration-300 bg-blue-600 text-white shadow-lg shadow-blue-600/30">
-        <i class="fa-solid fa-gamepad mr-2"></i> 7 ta Vocabulary O'yinlari
-      </button>
-      <button onclick="switchTab('scanner')" id="tab-scanner" class="px-7 py-3 rounded-xl font-bold text-sm transition-all duration-300 bg-slate-800/80 hover:bg-slate-800 text-slate-300">
-        <i class="fa-solid fa-camera mr-2"></i> Reading Rasm Skaner (AI)
-      </button>
+  <!-- Asosiy Boshqaruv / Tab Switcher -->
+  <main class="max-w-6xl mx-auto mt-6">
+    
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+      <!-- Tab tugmalari -->
+      <div class="flex items-center gap-2 p-1.5 bg-slate-900/90 border border-slate-800 rounded-2xl">
+        <button onclick="switchTab('vocab')" id="tab-vocab" class="px-5 py-2.5 rounded-xl font-bold text-xs md:text-sm transition-all duration-300 bg-blue-600 text-white shadow-lg shadow-blue-600/30 flex items-center gap-2">
+          <i class="fa-solid fa-gamepad"></i> 7 Ta Mini O'yin
+        </button>
+        <button onclick="switchTab('scanner')" id="tab-scanner" class="px-5 py-2.5 rounded-xl font-bold text-xs md:text-sm transition-all duration-300 hover:bg-slate-800 text-slate-400 hover:text-white flex items-center gap-2">
+          <i class="fa-solid fa-camera"></i> AI Reading Skaner
+        </button>
+      </div>
+
+      <!-- Lug'at To'plamini Tanlash (Deck Switcher) -->
+      <div class="w-full sm:w-auto flex items-center gap-2.5 bg-slate-900/90 border border-slate-800/90 px-3.5 py-2 rounded-2xl">
+        <span class="text-xs font-bold text-slate-400 whitespace-nowrap"><i class="fa-solid fa-layer-group text-blue-400 mr-1.5"></i> To'plam:</span>
+        <select id="deck-selector" onchange="changeActiveDeck(this.value)" class="bg-slate-950 border border-slate-700 text-blue-400 font-extrabold text-xs rounded-xl px-3 py-1.5 focus:outline-none focus:border-blue-500 cursor-pointer max-w-[220px] truncate">
+          <!-- Dinamik to'ldiriladi -->
+        </select>
+        <button onclick="deleteCurrentDeck()" title="To'plamni o'chirish" class="text-slate-500 hover:text-rose-400 transition text-xs p-1">
+          <i class="fa-solid fa-trash-can"></i>
+        </button>
+      </div>
     </div>
 
-    <!-- 1. VOCABULARY BO'LIMI (7 TA MINI O'YIN) -->
+    <!-- 1. MINI O'YINLAR BO'LIMI -->
     <section id="section-vocab" class="space-y-6">
-      
-      <!-- O'yinlar kartalari -->
-      <div id="games-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- 1. Flashcards -->
-        <div onclick="startGame('flashcards')" class="cursor-pointer group relative bg-gradient-to-b from-blue-900/40 to-slate-900/90 border border-blue-500/20 hover:border-blue-500 p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1 shadow-xl">
-          <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-lg mb-3">
-            <i class="fa-regular fa-clone"></i>
-          </div>
-          <h3 class="font-bold text-base text-white group-hover:text-blue-400 transition">Flashcards</h3>
-          <p class="text-xs text-slate-400 mt-1 leading-relaxed">Kartani aylantiring. O'ngga suring - bilasiz, chapga - qayta o'rganish.</p>
-          <div class="mt-4 flex items-center justify-between text-[11px] font-semibold text-blue-400">
-            <span>Flip / Swipe</span>
-            <i class="fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition"></i>
-          </div>
-        </div>
 
-        <!-- 2. Multiple choice -->
-        <div onclick="startGame('multiple-choice')" class="cursor-pointer group relative bg-gradient-to-b from-emerald-900/30 to-slate-900/90 border border-emerald-500/20 hover:border-emerald-500 p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1 shadow-xl">
-          <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg mb-3">
-            <i class="fa-solid fa-square-check"></i>
-          </div>
-          <h3 class="font-bold text-base text-white group-hover:text-emerald-400 transition">Multiple choice</h3>
-          <p class="text-xs text-slate-400 mt-1 leading-relaxed">So'zni ko'ring, to'g'ri ma'nosini 4 ta variant ichidan tanlang.</p>
-          <div class="mt-4 flex items-center justify-between text-[11px] font-semibold text-emerald-400">
-            <span>A • B • C • D</span>
-            <i class="fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition"></i>
-          </div>
-        </div>
-
-        <!-- 3. Matching pairs -->
-        <div onclick="startGame('matching')" class="cursor-pointer group relative bg-gradient-to-b from-teal-900/30 to-slate-900/90 border border-teal-500/20 hover:border-teal-500 p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1 shadow-xl">
-          <div class="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-400 flex items-center justify-center text-lg mb-3">
-            <i class="fa-solid fa-puzzle-piece"></i>
-          </div>
-          <h3 class="font-bold text-base text-white group-hover:text-teal-400 transition">Matching pairs</h3>
-          <p class="text-xs text-slate-400 mt-1 leading-relaxed">Oltita so'z, oltita ma'no. Imkon qadar tezroq juftlang.</p>
-          <div class="mt-4 flex items-center justify-between text-[11px] font-semibold text-teal-400">
-            <span>6 × 6 Grid</span>
-            <i class="fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition"></i>
-          </div>
-        </div>
-
-        <!-- 4. Fill the gap -->
-        <div onclick="startGame('fill-gap')" class="cursor-pointer group relative bg-gradient-to-b from-amber-900/30 to-slate-900/90 border border-amber-500/20 hover:border-amber-500 p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1 shadow-xl">
-          <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg mb-3">
-            <i class="fa-solid fa-pen-nib"></i>
-          </div>
-          <h3 class="font-bold text-base text-white group-hover:text-amber-400 transition">Fill the gap</h3>
-          <p class="text-xs text-slate-400 mt-1 leading-relaxed">Rasmdagi asl matn jumlasi - tushirib qoldirilgan so'zni toping.</p>
-          <div class="mt-4 flex items-center justify-between text-[11px] font-semibold text-amber-400">
-            <span>"... a ___ signal"</span>
-            <i class="fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition"></i>
-          </div>
-        </div>
-
-        <!-- 5. Word Rush -->
-        <div onclick="startGame('word-rush')" class="cursor-pointer group relative bg-gradient-to-b from-rose-900/30 to-slate-900/90 border border-rose-500/20 hover:border-rose-500 p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1 shadow-xl">
-          <div class="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-lg mb-3">
-            <i class="fa-solid fa-bolt"></i>
-          </div>
-          <h3 class="font-bold text-base text-white group-hover:text-rose-400 transition">Word Rush</h3>
-          <p class="text-xs text-slate-400 mt-1 leading-relaxed">60 soniya. To'g'ri javob +1s beradi, xato esa 3 soniyani oladi.</p>
-          <div class="mt-4 flex items-center justify-between text-[11px] font-semibold text-rose-400">
-            <span>60s • +1s / -3s</span>
-            <i class="fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition"></i>
-          </div>
-        </div>
-
-        <!-- 6. Typing race -->
-        <div onclick="startGame('typing-race')" class="cursor-pointer group relative bg-gradient-to-b from-indigo-900/30 to-slate-900/90 border border-indigo-500/20 hover:border-indigo-500 p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1 shadow-xl">
-          <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-lg mb-3">
-            <i class="fa-solid fa-keyboard"></i>
-          </div>
-          <h3 class="font-bold text-base text-white group-hover:text-indigo-400 transition">Typing race</h3>
-          <p class="text-xs text-slate-400 mt-1 leading-relaxed">Ma'noni ko'ring, inglizcha so'zni vaqtga qarshi terib chiqing.</p>
-          <div class="mt-4 flex items-center justify-between text-[11px] font-semibold text-indigo-400">
-            <span>Tezlik va Imla</span>
-            <i class="fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition"></i>
-          </div>
-        </div>
-
-        <!-- 7. Sentence builder -->
-        <div onclick="startGame('sentence-builder')" class="cursor-pointer group relative bg-gradient-to-b from-fuchsia-900/30 to-slate-900/90 border border-fuchsia-500/20 hover:border-fuchsia-500 p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1 shadow-xl">
-          <div class="w-10 h-10 rounded-xl bg-fuchsia-500/20 text-fuchsia-400 flex items-center justify-center text-lg mb-3">
-            <i class="fa-solid fa-cubes-stacked"></i>
-          </div>
-          <h3 class="font-bold text-base text-white group-hover:text-fuchsia-400 transition">Sentence builder</h3>
-          <p class="text-xs text-slate-400 mt-1 leading-relaxed">Gap bo'laklarini to'g'ri tartibda yig'ib to'liq jumla hosil qiling.</p>
-          <div class="mt-4 flex items-center justify-between text-[11px] font-semibold text-fuchsia-400">
-            <span>Syntax Master</span>
-            <i class="fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition"></i>
-          </div>
-        </div>
-
-        <!-- Lug'at statistikasi -->
-        <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-3xl flex flex-col justify-between">
+      <!-- O'yinlar Menyusi Paneli -->
+      <div id="games-grid" class="space-y-4">
+        <!-- Aktiv to'plam info banneri -->
+        <div class="p-4 rounded-2xl bg-gradient-to-r from-blue-950/40 via-indigo-950/20 to-slate-900/80 border border-blue-500/20 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
-              <span>Faol Lug'at Bazasida:</span>
-              <span id="total-words-badge" class="font-bold text-blue-400">6 ta so'z</span>
-            </div>
-            <p class="text-xs text-slate-500 leading-relaxed">Spaced Repetition: 1, 3, 7, 16 va 35-kunlar. Rasm skaner qilinsa, yangi so'zlar shu yerga qo'shiladi.</p>
+            <span class="text-[10px] uppercase font-black tracking-widest text-blue-400">Hozirgi mashq to'plami</span>
+            <h2 id="active-deck-title" class="text-lg md:text-xl font-black text-white tracking-wide">WEANING & INFANT DIET</h2>
           </div>
-          <button onclick="switchTab('scanner')" class="mt-4 w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-xs font-bold rounded-xl transition">
-            + Yangi Reading Matn Yuklash
-          </button>
+          <div class="flex items-center gap-2">
+            <span id="active-deck-count" class="px-3 py-1 bg-blue-500/20 text-blue-300 font-black text-xs rounded-xl border border-blue-500/30">12 ta so'z mavjud</span>
+            <button onclick="switchTab('scanner')" class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5">
+              <i class="fa-solid fa-plus text-blue-400"></i> Yangi rasm skanerlash
+            </button>
+          </div>
+        </div>
+
+        <!-- 7 Ta O'yin Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- 1. Flashcards -->
+          <div onclick="startGame('flashcards')" class="cursor-pointer group relative bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-blue-500/60 p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 shadow-xl">
+            <div class="w-11 h-11 rounded-2xl bg-blue-500/15 text-blue-400 flex items-center justify-center text-lg mb-3.5 group-hover:scale-110 transition">
+              <i class="fa-regular fa-clone"></i>
+            </div>
+            <h3 class="font-extrabold text-base text-white group-hover:text-blue-400 transition">Flashcards 2.0</h3>
+            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Spaced Repetition: 10 ta kartali jiddiy mashg'ulot. Notion shriftlari va aniq kontekst.</p>
+            <div class="mt-4 flex items-center justify-between text-[11px] font-bold text-blue-400">
+              <span>10 ta karta drill</span>
+              <i class="fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition transform group-hover:translate-x-1"></i>
+            </div>
+          </div>
+
+          <!-- 2. Multiple choice -->
+          <div onclick="startGame('multiple-choice')" class="cursor-pointer group relative bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-emerald-500/60 p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 shadow-xl">
+            <div class="w-11 h-11 rounded-2xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center text-lg mb-3.5 group-hover:scale-110 transition">
+              <i class="fa-solid fa-square-check"></i>
+            </div>
+            <h3 class="font-extrabold text-base text-white group-hover:text-emerald-400 transition">Multiple Choice</h3>
+            <p class="text-xs text-slate-400 mt-1 leading-relaxed">10 ta savol. Xato tanlansa qizil, to'g'risi yashil yonadi. Natija statistikasi beriladi.</p>
+            <div class="mt-4 flex items-center justify-between text-[11px] font-bold text-emerald-400">
+              <span>Instant Feedback</span>
+              <i class="fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition transform group-hover:translate-x-1"></i>
+            </div>
+          </div>
+
+          <!-- 3. Matching pairs -->
+          <div onclick="startGame('matching')" class="cursor-pointer group relative bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-teal-500/60 p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 shadow-xl">
+            <div class="w-11 h-11 rounded-2xl bg-teal-500/15 text-teal-400 flex items-center justify-center text-lg mb-3.5 group-hover:scale-110 transition">
+              <i class="fa-solid fa-puzzle-piece"></i>
+            </div>
+            <h3 class="font-extrabold text-base text-white group-hover:text-teal-400 transition">Matching Pairs</h3>
+            <p class="text-xs text-slate-400 mt-1 leading-relaxed">6 ta so'z va ma'nolar. Juftlab boring, combo multiplikatori va vaqt rekordlari.</p>
+            <div class="mt-4 flex items-center justify-between text-[11px] font-bold text-teal-400">
+              <span>Combo & Neon Grid</span>
+              <i class="fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition transform group-hover:translate-x-1"></i>
+            </div>
+          </div>
+
+          <!-- 4. Fill the gap -->
+          <div onclick="startGame('fill-gap')" class="cursor-pointer group relative bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-amber-500/60 p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 shadow-xl">
+            <div class="w-11 h-11 rounded-2xl bg-amber-500/15 text-amber-400 flex items-center justify-center text-lg mb-3.5 group-hover:scale-110 transition">
+              <i class="fa-solid fa-pen-nib"></i>
+            </div>
+            <h3 class="font-extrabold text-base text-white group-hover:text-amber-400 transition">Fill The Gap</h3>
+            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Reading gaplari bo'yicha tushirib qoldirilgan so'zlar. Harf yordamlari bilan to'ldiring.</p>
+            <div class="mt-4 flex items-center justify-between text-[11px] font-bold text-amber-400">
+              <span>Context Quiz</span>
+              <i class="fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition transform group-hover:translate-x-1"></i>
+            </div>
+          </div>
+
+          <!-- 5. Word Rush -->
+          <div onclick="startGame('word-rush')" class="cursor-pointer group relative bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-rose-500/60 p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 shadow-xl">
+            <div class="w-11 h-11 rounded-2xl bg-rose-500/15 text-rose-400 flex items-center justify-center text-lg mb-3.5 group-hover:scale-110 transition">
+              <i class="fa-solid fa-bolt"></i>
+            </div>
+            <h3 class="font-extrabold text-base text-white group-hover:text-rose-400 transition">Word Rush</h3>
+            <p class="text-xs text-slate-400 mt-1 leading-relaxed">60 soniya va yuqori tezlik. To'g'ri topsangiz +2s, adashsangiz -3s. Adrenalinli poyga.</p>
+            <div class="mt-4 flex items-center justify-between text-[11px] font-bold text-rose-400">
+              <span>Arcade Speed</span>
+              <i class="fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition transform group-hover:translate-x-1"></i>
+            </div>
+          </div>
+
+          <!-- 6. Typing race -->
+          <div onclick="startGame('typing-race')" class="cursor-pointer group relative bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-indigo-500/60 p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 shadow-xl">
+            <div class="w-11 h-11 rounded-2xl bg-indigo-500/15 text-indigo-400 flex items-center justify-center text-lg mb-3.5 group-hover:scale-110 transition">
+              <i class="fa-solid fa-keyboard"></i>
+            </div>
+            <h3 class="font-extrabold text-base text-white group-hover:text-indigo-400 transition">Typing Race</h3>
+            <p class="text-xs text-slate-400 mt-1 leading-relaxed">MonkeyType uslubi. Harfma-harf terish, jonli xatoliklar va WPM tezligini o'lchash.</p>
+            <div class="mt-4 flex items-center justify-between text-[11px] font-bold text-indigo-400">
+              <span>WPM & Accuracy</span>
+              <i class="fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition transform group-hover:translate-x-1"></i>
+            </div>
+          </div>
+
+          <!-- 7. Sentence builder -->
+          <div onclick="startGame('sentence-builder')" class="cursor-pointer group relative bg-slate-900/80 hover:bg-slate-900 border border-slate-800 hover:border-fuchsia-500/60 p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 shadow-xl">
+            <div class="w-11 h-11 rounded-2xl bg-fuchsia-500/15 text-fuchsia-400 flex items-center justify-center text-lg mb-3.5 group-hover:scale-110 transition">
+              <i class="fa-solid fa-cubes-stacked"></i>
+            </div>
+            <h3 class="font-extrabold text-base text-white group-hover:text-fuchsia-400 transition">Sentence Builder</h3>
+            <p class="text-xs text-slate-400 mt-1 leading-relaxed">Sintaktik bloklar. Gapni parchalardan to'g'ri yig'ing va grammatikani singdiring.</p>
+            <div class="mt-4 flex items-center justify-between text-[11px] font-bold text-fuchsia-400">
+              <span>Syntax Engine</span>
+              <i class="fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition transform group-hover:translate-x-1"></i>
+            </div>
+          </div>
+
+          <!-- To'plam statistikasi -->
+          <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 p-5 rounded-3xl flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between text-xs font-bold text-slate-400 mb-2">
+                <span>To'plam Holati:</span>
+                <span class="text-emerald-400">100% Tayyor</span>
+              </div>
+              <p class="text-xs text-slate-400 leading-relaxed">Barcha mini-o'yinlar siz tanlagan <b>faol to'plam</b> so'zlariga avtomatik moslashadi.</p>
+            </div>
+            <div class="pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs">
+              <span class="text-slate-500">IELTS Band:</span>
+              <span class="font-black text-amber-400">Band 7.5 - 8.5</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- O'yin Maydoni -->
-      <div id="game-arena" class="hidden bg-slate-900/90 border border-slate-800 p-6 md:p-8 rounded-3xl shadow-2xl relative">
-        <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-800">
+      <!-- O'yin Maydoni (Arena) -->
+      <div id="game-arena" class="hidden bg-slate-900/95 border border-slate-800/90 p-5 sm:p-8 rounded-3xl shadow-2xl relative">
+        <!-- Arena Yuqori Paneli -->
+        <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-800/80">
           <div class="flex items-center gap-3">
-            <button onclick="closeGameArena()" class="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-300 transition">
+            <button onclick="closeGameArena()" class="w-10 h-10 rounded-2xl bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-300 transition shadow-md">
               <i class="fa-solid fa-arrow-left"></i>
             </button>
-            <h2 id="current-game-title" class="font-extrabold text-lg text-white">O'yin Nomi</h2>
+            <div>
+              <h2 id="current-game-title" class="font-black text-base sm:text-lg text-white">O'yin Nomi</h2>
+              <p id="current-game-deck-name" class="text-[11px] text-blue-400 font-bold uppercase tracking-wider">WEANING</p>
+            </div>
           </div>
-          <div id="game-stats" class="text-sm font-bold text-blue-400"></div>
+          <div id="game-header-stats" class="text-right"></div>
         </div>
 
-        <div id="game-stage" class="min-h-[350px] flex flex-col items-center justify-center"></div>
+        <!-- O'yin Bosqichi -->
+        <div id="game-stage" class="min-h-[380px] flex flex-col items-center justify-center"></div>
       </div>
+
     </section>
 
-    <!-- 2. READING RASM SKANER (AI VISION) -->
+    <!-- 2. AI READING SKANER BO'LIMI -->
     <section id="section-scanner" class="hidden space-y-6">
-      <div class="bg-slate-900/80 border border-slate-800 p-6 md:p-8 rounded-3xl">
+      <div class="bg-slate-900/80 border border-slate-800 p-6 md:p-10 rounded-3xl">
         <div class="max-w-2xl mx-auto text-center space-y-4">
-          <div class="w-16 h-16 mx-auto rounded-3xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-2xl">
+          <div class="w-16 h-16 mx-auto rounded-3xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-2xl shadow-xl shadow-blue-500/10">
             <i class="fa-solid fa-brain"></i>
           </div>
-          <h2 class="text-2xl font-black">Cambridge Reading Sahifasini Yuklang</h2>
-          <p class="text-sm text-slate-400">
-            Kitobdan sahifani rasmga oling. Sun'iy intellekt matndagi barcha B2/C1 darajadagi akademik so'zlar va iboralarni bir zumda ajratib, 7 ta o'yinga joylaydi.
+          <h2 class="text-2xl sm:text-3xl font-black text-white">Cambridge Reading Sahifasini Yuklang</h2>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            Kitobdan xohlagan sahifangizni suratga oling. Gemini AI avtomatik tarzda matnga mavzu sarlavhasi beradi va <b>kamida 10–15 ta eng muhim B2/C1 akademik so'zlar</b> to'plamini shakllantirib, o'yinlaringizga yuklaydi.
           </p>
 
           <div class="pt-4">
-            <label class="cursor-pointer inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 font-bold rounded-2xl shadow-xl shadow-blue-500/25 transition">
+            <label class="cursor-pointer inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 font-extrabold rounded-2xl shadow-xl shadow-blue-600/30 transition transform hover:scale-[1.02] active:scale-95 text-white">
               <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
-              <span>Rasm Tanlash yoki Suratga Olish</span>
+              <span>Rasm Tanlash yoki Kamera Olish</span>
               <input type="file" id="reading-file-input" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
             </label>
           </div>
 
-          <div id="scan-preview-box" class="hidden mt-6 relative max-w-md mx-auto rounded-2xl overflow-hidden border border-blue-500/40">
+          <!-- Skaner Holati Animatsiyasi -->
+          <div id="scan-preview-box" class="hidden mt-6 relative max-w-md mx-auto rounded-3xl overflow-hidden border border-blue-500/40 shadow-2xl">
             <img id="scan-preview-img" src="" alt="Reading text" class="w-full h-auto opacity-70">
             <div id="laser-line" class="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent scanner-line"></div>
-            <div id="scan-loading-text" class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3">
+            <div id="scan-loading-text" class="absolute inset-0 bg-slate-950/85 backdrop-blur-sm flex flex-col items-center justify-center gap-3">
               <i class="fa-solid fa-spinner fa-spin text-3xl text-blue-400"></i>
-              <p class="text-sm font-semibold text-slate-200">Gemini matnni chuqur tahlil qilmoqda...</p>
+              <p class="text-sm font-bold text-slate-200">Gemini matndan B2/C1 lug'atlarni ajratmoqda...</p>
+              <p class="text-xs text-slate-400">Kamida 10 ta so'z va to'plam sarlavhasi yaratilmoqda</p>
             </div>
           </div>
         </div>
@@ -239,69 +310,193 @@
 
   </main>
 
-  <!-- JAVASCRIPT LOGIKASI -->
+  <!-- UNIVERSAL G'ALABA / RESULT MODALI -->
+  <div id="result-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700/80 rounded-3xl p-6 sm:p-8 max-w-md w-full text-center space-y-6 shadow-2xl animate-pop">
+      <div id="modal-icon" class="w-16 h-16 mx-auto rounded-3xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-3xl">
+        <i class="fa-solid fa-trophy"></i>
+      </div>
+      <div>
+        <h3 id="modal-title" class="text-2xl font-black text-white">Mashg'ulot Yakunlandi!</h3>
+        <p id="modal-subtitle" class="text-xs text-slate-400 mt-1">Siz bugun ajoyib natija ko'rsatdingiz!</p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3 bg-slate-950 p-4 rounded-2xl border border-slate-800">
+        <div>
+          <p class="text-[10px] text-slate-400 uppercase font-bold">To'g'ri Javoblar</p>
+          <p id="modal-stat-correct" class="text-xl font-black text-emerald-400">10 / 10</p>
+        </div>
+        <div>
+          <p class="text-[10px] text-slate-400 uppercase font-bold">Qozonilgan XP</p>
+          <p id="modal-stat-xp" class="text-xl font-black text-indigo-400">+100 XP</p>
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <button onclick="closeResultModal()" class="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition">
+          Bosh Menyuga
+        </button>
+        <button onclick="replayCurrentGame()" class="flex-1 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs transition">
+          Qayta O'ynash
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    let vocabularyDeck = [
+    // ==========================================
+    // DECK VA MA'LUMOTLAR BOSHQARUVI (STORAGE)
+    // ==========================================
+    const DEFAULT_DECKS = [
       {
-        word: "deteriorate",
-        phonetic: "/dɪˈtɪəriəreɪt/",
-        en_meaning: "To become progressively worse in quality or condition",
-        uz_meaning: "Yomonlashmoq, ahvoli og'irlashmoq",
-        context_sentence: "Without proper restoration, historical buildings begin to deteriorate rapidly.",
-        distractors: ["kuchaymoq", "yaxshilanmoq", "davom etmoq"]
-      },
-      {
-        word: "mitigate",
-        phonetic: "/ˈmɪtɪɡeɪt/",
-        en_meaning: "To make something bad less severe or painful",
-        uz_meaning: "Yumshatmoq, ta'sirini kamaytirmoq",
-        context_sentence: "The local council took urgent action to mitigate the flood risks.",
-        distractors: ["keltirib chiqarmoq", "zarar yetkazmoq", "taqiqlamoq"]
-      },
-      {
-        word: "ubiquitous",
-        phonetic: "/juːˈbɪkwɪtəs/",
-        en_meaning: "Present, appearing, or found everywhere",
-        uz_meaning: "Hamma joyda uchraydigan, keng tarqalgan",
-        context_sentence: "Smartphones have become ubiquitous in modern urban environments.",
-        distractors: ["noyob", "foydasiz", "eskirgan"]
-      },
-      {
-        word: "resilient",
-        phonetic: "/rɪˈzɪliənt/",
-        en_meaning: "Able to recover quickly from difficult conditions",
-        uz_meaning: "Chidamli, bardoshli, qayta tiklanuvchan",
-        context_sentence: "Architects must design resilient structures that withstand natural disasters.",
-        distractors: ["mo'rt", "xavfli", "qimmat"]
-      },
-      {
-        word: "plausible",
-        phonetic: "/ˈplɔːzəbl/",
-        en_meaning: "Seeming reasonable or probable",
-        uz_meaning: "Haqiqatga yaqin, aqlga sig'adigan",
-        context_sentence: "Researchers failed to provide a plausible explanation for the anomaly.",
-        distractors: ["shubhali", "noto'g'ri", "tasodifiy"]
-      },
-      {
-        word: "inevitable",
-        phonetic: "/ɪnˈevɪtəbl/",
-        en_meaning: "Certain to happen; unavoidable",
-        uz_meaning: "Muqarrar, qutulib bo'lmas",
-        context_sentence: "Rapid urbanization makes structural changes in society inevitable.",
-        distractors: ["ehtimolsiz", "qiyin", "vaqtinchalik"]
+        id: "default-1",
+        title: "WEANING & INFANT NUTRITION",
+        date: "2026-10-07",
+        words: [
+          {
+            word: "deteriorate",
+            phonetic: "/dɪˈtɪəriəreɪt/",
+            en_meaning: "To become progressively worse in condition or quality",
+            uz_meaning: "yomonlashmoq, ahvoli og'irlashmoq",
+            context_sentence: "Without proper nutritional balance, infant digestive health may deteriorate.",
+            distractors: ["kuchaymoq", "yaxshilanmoq", "moslashmoq"]
+          },
+          {
+            word: "mitigate",
+            phonetic: "/ˈmɪtɪɡeɪt/",
+            en_meaning: "To make something bad or painful less severe",
+            uz_meaning: "yumshatmoq, ta'sirini kamaytirmoq",
+            context_sentence: "Exclusive breastfeeding helps mitigate initial infection hazards.",
+            distractors: ["keltirib chiqarmoq", "zararlamoq", "oshirib yubormoq"]
+          },
+          {
+            word: "ubiquitous",
+            phonetic: "/juːˈbɪkwɪtəs/",
+            en_meaning: "Present, appearing, or found everywhere",
+            uz_meaning: "hamma joyda uchraydigan, ommaviy",
+            context_sentence: "Processed weaning snacks are now ubiquitous in modern urban groceries.",
+            distractors: ["noyob", "qimmatbaho", "eskirgan"]
+          },
+          {
+            word: "resilient",
+            phonetic: "/rɪˈzɪliənt/",
+            en_meaning: "Able to recover quickly from difficult conditions",
+            uz_meaning: "chidamli, bardoshli, qayta tiklanuvchan",
+            context_sentence: "A baby's immune system becomes resilient through gradual food exposure.",
+            distractors: ["mo'rt", "zaif", "beqaror"]
+          },
+          {
+            word: "plausible",
+            phonetic: "/ˈplɔːzəbl/",
+            en_meaning: "Seeming reasonable or probable",
+            uz_meaning: "haqiqatga yaqin, aqlga sig'adigan",
+            context_sentence: "Pediatricians proposed a plausible hypothesis regarding early allergy onset.",
+            distractors: ["shubhali", "noto'g'ri", "tasodifiy"]
+          },
+          {
+            word: "inevitable",
+            phonetic: "/ɪnˈevɪtəbl/",
+            en_meaning: "Certain to happen; unavoidable",
+            uz_meaning: "muqarrar, qochib bo'lmas",
+            context_sentence: "Occasional feeding setbacks are inevitable during dietary transitions.",
+            distractors: ["ehtimolsiz", "qiyin", "vaqtinchalik"]
+          },
+          {
+            word: "subsequent",
+            phonetic: "/ˈsʌbsɪkwənt/",
+            en_meaning: "Coming after something in time; following",
+            uz_meaning: "keyingi, navbatdagi",
+            context_sentence: "Subsequent feeding trials demonstrated noticeable digestive improvements.",
+            distractors: ["oldingi", "dastlabki", "oxirgi"]
+          },
+          {
+            word: "susceptible",
+            phonetic: "/səˈseptəbl/",
+            en_meaning: "Likely or liable to be influenced or harmed",
+            uz_meaning: "ta'sirchan, moyil, tez chalinuvchi",
+            context_sentence: "Underdeveloped guts are susceptible to opportunistic microbial growth.",
+            distractors: ["himoyalangan", "chidamli", "beg'am"]
+          },
+          {
+            word: "advent",
+            phonetic: "/ˈædvent/",
+            en_meaning: "The arrival of a notable person, thing, or event",
+            uz_meaning: "kirib kelishi, paydo bo'lishi",
+            context_sentence: "The advent of fortified complementary cereals transformed infant survival rates.",
+            distractors: ["ketishi", "yo'qolishi", "tugashi"]
+          },
+          {
+            word: "predominantly",
+            phonetic: "/prɪˈdɒmɪnəntli/",
+            en_meaning: "Mainly; for the most part",
+            uz_meaning: "asosan, ko'pincha",
+            context_sentence: "Traditional communities rely predominantly on grain porridge for early weaning.",
+            distractors: ["kamdan-kam", "faqatgina", "umuman"]
+          }
+        ]
       }
     ];
 
-    function playTTS(text) {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'en-US';
-        utterance.rate = 0.9;
-        window.speechSynthesis.speak(utterance);
+    let decks = [];
+    try {
+      const stored = localStorage.getItem('ielts_decks_v2');
+      decks = stored ? JSON.parse(stored) : DEFAULT_DECKS;
+    } catch(e) {
+      decks = DEFAULT_DECKS;
+    }
+
+    let activeDeckId = decks[0]?.id || 'default-1';
+
+    function getActiveDeck() {
+      return decks.find(d => d.id === activeDeckId) || decks[0];
+    }
+
+    function saveDecks() {
+      try {
+        localStorage.setItem('ielts_decks_v2', JSON.stringify(decks));
+      } catch(e) {}
+    }
+
+    function initDeckUI() {
+      const selector = document.getElementById('deck-selector');
+      selector.innerHTML = '';
+      decks.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d.id;
+        opt.innerText = `${d.title} (${d.words.length})`;
+        if (d.id === activeDeckId) opt.selected = true;
+        selector.appendChild(opt);
+      });
+
+      const current = getActiveDeck();
+      document.getElementById('active-deck-title').innerText = current.title;
+      document.getElementById('active-deck-count').innerText = `${current.words.length} ta so'z mavjud`;
+      document.getElementById('current-game-deck-name').innerText = current.title;
+    }
+
+    function changeActiveDeck(newId) {
+      activeDeckId = newId;
+      initDeckUI();
+      playTone(500, 'sine', 0.1);
+    }
+
+    function deleteCurrentDeck() {
+      if (decks.length <= 1) {
+        alert("Oxirgi to'plamni o'chira olmaysiz!");
+        return;
+      }
+      if (confirm(`Rostdan ham "${getActiveDeck().title}" to'plamini o'chirmoqchimisiz?`)) {
+        decks = decks.filter(d => d.id !== activeDeckId);
+        activeDeckId = decks[0].id;
+        saveDecks();
+        initDeckUI();
       }
     }
 
+    // ==========================================
+    // AUDIO VA GAMIFIKATSIYA EFFEKTLARI
+    // ==========================================
+    let userXP = 450;
     let audioCtx = null;
     function playTone(freq, type, duration) {
       try {
@@ -310,9 +505,9 @@
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = type;
-        osc.frequency.value = freq;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
         gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start();
@@ -320,141 +515,244 @@
       } catch(e) {}
     }
 
+    function sndCorrect() {
+      playTone(523.25, 'sine', 0.1);
+      setTimeout(() => playTone(659.25, 'sine', 0.2), 80);
+    }
+    function sndWrong() {
+      playTone(180, 'sawtooth', 0.25);
+    }
+    function sndComplete() {
+      playTone(440, 'sine', 0.12);
+      setTimeout(() => playTone(554, 'sine', 0.12), 100);
+      setTimeout(() => playTone(659, 'sine', 0.25), 200);
+    }
+
+    function addXP(amount) {
+      userXP += amount;
+      document.getElementById('hud-xp').innerText = `${userXP} XP`;
+    }
+
+    function playTTS(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'en-US';
+        u.rate = 0.9;
+        window.speechSynthesis.speak(u);
+      }
+    }
+
     function switchTab(tab) {
       ['vocab', 'scanner'].forEach(t => {
         document.getElementById(`section-${t}`).classList.add('hidden');
-        document.getElementById(`tab-${t}`).className = 'px-7 py-3 rounded-xl font-bold text-sm transition-all duration-300 bg-slate-800/80 hover:bg-slate-800 text-slate-300';
+        document.getElementById(`tab-${t}`).className = 'px-5 py-2.5 rounded-xl font-bold text-xs md:text-sm transition-all duration-300 hover:bg-slate-800 text-slate-400 hover:text-white flex items-center gap-2';
       });
       document.getElementById(`section-${tab}`).classList.remove('hidden');
-      document.getElementById(`tab-${tab}`).className = 'px-7 py-3 rounded-xl font-bold text-sm transition-all duration-300 bg-blue-600 text-white shadow-lg shadow-blue-600/30';
+      document.getElementById(`tab-${tab}`).className = 'px-5 py-2.5 rounded-xl font-bold text-xs md:text-sm transition-all duration-300 bg-blue-600 text-white shadow-lg shadow-blue-600/30 flex items-center gap-2';
     }
 
-    // O'yinlar boshqaruvi
+    // ==========================================
+    // MODAL VA ARENA BOSHQARUVI
+    // ==========================================
     let currentGame = '';
-    let gameIndex = 0;
-    let score = 0;
-    let timerInterval = null;
+    let gameSessionWords = [];
+    let currentIndex = 0;
+    let correctCount = 0;
+    let totalQuestions = 10;
+    let gameTimer = null;
 
     function startGame(gameType) {
       currentGame = gameType;
-      gameIndex = 0;
-      score = 0;
-      clearInterval(timerInterval);
+      const deck = getActiveDeck();
+      if (!deck || deck.words.length === 0) {
+        alert("To'plamda so'zlar mavjud emas!");
+        return;
+      }
+
+      // So'zlarni aralashtiramiz va 10 tasini olamiz
+      gameSessionWords = [...deck.words].sort(() => Math.random() - 0.5);
+      totalQuestions = Math.min(10, gameSessionWords.length);
+      currentIndex = 0;
+      correctCount = 0;
+      clearInterval(gameTimer);
 
       document.getElementById('games-grid').classList.add('hidden');
       document.getElementById('game-arena').classList.remove('hidden');
 
       const titles = {
-        'flashcards': 'Flashcards — Spaced Repetition Drill',
-        'multiple-choice': 'Multiple Choice — To\'g\'ri ma\'noni tanlang',
-        'matching': 'Matching Pairs — 6x6 Juftlik',
-        'fill-gap': 'Fill the Gap — Kontekst bo\'yicha to\'ldiring',
-        'word-rush': 'Word Rush — 60 Soniyalik Poyga',
-        'typing-race': 'Typing Race — Tezkor terish',
-        'sentence-builder': 'Sentence Builder — Sintaktik gap quruvchi'
+        'flashcards': 'Flashcards Drill (10 Karta)',
+        'multiple-choice': 'Multiple Choice (10 Savol)',
+        'matching': 'Matching Pairs (Neon Matrix)',
+        'fill-gap': 'Fill The Gap (IELTS Kontekst)',
+        'word-rush': 'Word Rush (Arcade 60s)',
+        'typing-race': 'Typing Race (MonkeyType Mode)',
+        'sentence-builder': 'Sentence Builder (Syntax Engine)'
       };
-      document.getElementById('current-game-title').innerText = titles[gameType] || 'O\'yin';
-      renderGame();
+      document.getElementById('current-game-title').innerText = titles[gameType] || "O'yin";
+      document.getElementById('current-game-deck-name').innerText = deck.title;
+
+      renderCurrentStage();
     }
 
     function closeGameArena() {
-      clearInterval(timerInterval);
+      clearInterval(gameTimer);
       document.getElementById('game-arena').classList.add('hidden');
       document.getElementById('games-grid').classList.remove('hidden');
     }
 
-    function renderGame() {
-      const stage = document.getElementById('game-stage');
-      const stats = document.getElementById('game-stats');
-      stage.innerHTML = '';
-
-      if (currentGame === 'flashcards') renderFlashcards(stage, stats);
-      else if (currentGame === 'multiple-choice') renderMultipleChoice(stage, stats);
-      else if (currentGame === 'matching') renderMatching(stage, stats);
-      else if (currentGame === 'fill-gap') renderFillGap(stage, stats);
-      else if (currentGame === 'word-rush') renderWordRush(stage, stats);
-      else if (currentGame === 'typing-race') renderTypingRace(stage, stats);
-      else if (currentGame === 'sentence-builder') renderSentenceBuilder(stage, stats);
+    function showResultModal(title, subtitle, correct, total, earnedXP) {
+      sndComplete();
+      document.getElementById('modal-title').innerText = title;
+      document.getElementById('modal-subtitle').innerText = subtitle;
+      document.getElementById('modal-stat-correct').innerText = `${correct} / ${total}`;
+      document.getElementById('modal-stat-xp').innerText = `+${earnedXP} XP`;
+      addXP(earnedXP);
+      document.getElementById('result-modal').classList.remove('hidden');
     }
 
-    // 1. Flashcards
+    function closeResultModal() {
+      document.getElementById('result-modal').classList.add('hidden');
+      closeGameArena();
+    }
+
+    function replayCurrentGame() {
+      document.getElementById('result-modal').classList.add('hidden');
+      startGame(currentGame);
+    }
+
+    function renderCurrentStage() {
+      const stage = document.getElementById('game-stage');
+      const headerStats = document.getElementById('game-header-stats');
+      stage.innerHTML = '';
+
+      if (currentGame === 'flashcards') renderFlashcards(stage, headerStats);
+      else if (currentGame === 'multiple-choice') renderMultipleChoice(stage, headerStats);
+      else if (currentGame === 'matching') renderMatching(stage, headerStats);
+      else if (currentGame === 'fill-gap') renderFillGap(stage, headerStats);
+      else if (currentGame === 'word-rush') renderWordRush(stage, headerStats);
+      else if (currentGame === 'typing-race') renderTypingRace(stage, headerStats);
+      else if (currentGame === 'sentence-builder') renderSentenceBuilder(stage, headerStats);
+    }
+
+    // ==========================================
+    // 1. FLASHCARDS 2.0 (NOTION/EDITORIAL STYLE)
+    // ==========================================
     function renderFlashcards(stage, stats) {
-      const item = vocabularyDeck[gameIndex % vocabularyDeck.length];
-      stats.innerText = `Karta: ${gameIndex + 1} / ${vocabularyDeck.length}`;
+      if (currentIndex >= totalQuestions) {
+        showResultModal("10 ta Karta Tugadi!", "To'plam xotirangizda mustahkamlandi.", totalQuestions, totalQuestions, 80);
+        return;
+      }
+
+      const item = gameSessionWords[currentIndex];
+      stats.innerHTML = `<span class="px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-xl font-black text-xs">${currentIndex + 1} / ${totalQuestions}</span>`;
 
       stage.innerHTML = `
-        <div class="card-flip w-full max-w-md h-80 cursor-pointer" onclick="this.querySelector('.card-inner').classList.toggle('flipped')">
-          <div class="card-inner relative w-full h-full">
-            <div class="card-front absolute inset-0 bg-slate-950 border border-blue-500/30 rounded-3xl p-6 flex flex-col items-center justify-between text-center shadow-xl">
-              <span class="text-xs uppercase font-extrabold text-blue-400 tracking-wider">Old tomoni (Bosganda aylanadi)</span>
-              <div>
-                <h2 class="text-3xl font-black text-white capitalize tracking-wide">${item.word}</h2>
-                <p class="text-sm text-slate-400 mt-1">${item.phonetic || ''}</p>
-                <button onclick="event.stopPropagation(); playTTS('${item.word}')" class="mt-3 px-3 py-1 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 rounded-full text-xs font-bold transition">
-                  <i class="fa-solid fa-volume-high mr-1"></i> Ovoz
+        <div class="card-flip w-full max-w-lg min-h-[380px] cursor-pointer" onclick="this.querySelector('.card-inner').classList.toggle('flipped')">
+          <div class="card-inner relative w-full h-full min-h-[380px]">
+            
+            <!-- OLD TOMONI -->
+            <div class="card-front absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 border border-blue-500/30 rounded-3xl p-7 flex flex-col justify-between shadow-2xl">
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-1 bg-blue-500/20 text-blue-400 font-black text-[10px] rounded-lg tracking-wider uppercase">IELTS B2/C1</span>
+                <span class="text-xs text-slate-500 font-semibold"><i class="fa-solid fa-arrows-rotate mr-1"></i> Kartani bosing</span>
+              </div>
+              <div class="text-center py-6">
+                <h2 class="text-4xl sm:text-5xl font-black text-white capitalize tracking-tight heading-font">${item.word}</h2>
+                <p class="text-sm font-semibold text-indigo-400/90 mt-2 font-mono tracking-widest">${item.phonetic || ''}</p>
+                <button onclick="event.stopPropagation(); playTTS('${item.word}')" class="mt-4 px-4 py-2 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 rounded-full text-xs font-black transition inline-flex items-center gap-2">
+                  <i class="fa-solid fa-volume-high"></i> Tinglash
                 </button>
               </div>
-              <p class="text-[11px] text-slate-500">Orqaga o'girish uchun kartani bosing</p>
+              <p class="text-center text-[11px] text-slate-500">Orqa tomonini ko'rish uchun ustiga bosing</p>
             </div>
-            <div class="card-back absolute inset-0 bg-slate-950 border border-emerald-500/30 rounded-3xl p-6 flex flex-col justify-between text-left shadow-xl">
-              <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider">Ta'rif va Asl Kontekst</span>
-              <div class="space-y-3">
+
+            <!-- ORQA TOMONI (NOTION / EDITORIAL STYLE) -->
+            <div class="card-back absolute inset-0 bg-slate-950 border border-emerald-500/30 rounded-3xl p-7 flex flex-col justify-between shadow-2xl">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                <span class="text-[11px] font-black uppercase tracking-wider text-emerald-400">Tahlil & Kontekst</span>
+                <span class="text-xs text-slate-500 font-mono">So'z #${currentIndex + 1}</span>
+              </div>
+
+              <div class="space-y-4 my-auto">
                 <div>
-                  <p class="text-[11px] text-slate-400 uppercase font-bold">English Meaning:</p>
-                  <p class="text-sm font-semibold text-slate-200">${item.en_meaning}</p>
+                  <p class="text-[10px] text-slate-500 uppercase font-black tracking-wider">English Definition</p>
+                  <p class="text-sm sm:text-base font-semibold text-slate-200 mt-0.5 leading-snug">${item.en_meaning}</p>
                 </div>
-                <div>
-                  <p class="text-[11px] text-slate-400 uppercase font-bold">O'zbekcha:</p>
-                  <p class="text-sm font-bold text-emerald-400">${item.uz_meaning}</p>
+
+                <div class="bg-emerald-950/30 border border-emerald-500/20 p-3 rounded-2xl">
+                  <p class="text-[10px] text-emerald-400 uppercase font-black tracking-wider">O'zbekcha Tarjimasi</p>
+                  <p class="text-base sm:text-lg font-black text-emerald-300 capitalize mt-0.5">${item.uz_meaning}</p>
                 </div>
-                <div class="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800">
-                  <p class="text-[10px] text-slate-500 uppercase font-bold">Reading Context:</p>
-                  <p class="text-xs text-slate-300 italic">"${item.context_sentence}"</p>
+
+                <div class="bg-slate-900/90 border border-slate-800 p-3 rounded-2xl relative">
+                  <i class="fa-solid fa-quote-left text-slate-700 text-xs absolute top-2 right-3"></i>
+                  <p class="text-[10px] text-slate-500 uppercase font-black tracking-wider">Authentic IELTS Reading Context</p>
+                  <p class="text-xs text-slate-300 italic mt-1 leading-relaxed">"${item.context_sentence}"</p>
                 </div>
               </div>
-              <div class="flex items-center justify-between pt-2">
-                <button onclick="event.stopPropagation(); nextCard(false)" class="px-4 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-400 text-xs font-bold rounded-xl transition">
-                  <i class="fa-solid fa-rotate-left mr-1"></i> Qayta o'rganish
+
+              <div class="flex items-center gap-3 pt-2">
+                <button onclick="event.stopPropagation(); nextCardAction(false)" class="flex-1 py-3 bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 text-xs font-black rounded-xl transition flex items-center justify-center gap-1.5">
+                  <i class="fa-solid fa-rotate-left"></i> Qayta o'rganish
                 </button>
-                <button onclick="event.stopPropagation(); nextCard(true)" class="px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 text-xs font-bold rounded-xl transition">
-                  <i class="fa-solid fa-check mr-1"></i> Bildim
+                <button onclick="event.stopPropagation(); nextCardAction(true)" class="flex-1 py-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 text-xs font-black rounded-xl transition flex items-center justify-center gap-1.5">
+                  <i class="fa-solid fa-check"></i> Yodda qoldi
                 </button>
               </div>
+
             </div>
+
           </div>
         </div>
       `;
     }
 
-    function nextCard(known) {
-      playTone(known ? 600 : 300, 'sine', 0.15);
-      gameIndex++;
-      renderGame();
+    function nextCardAction(known) {
+      if (known) {
+        sndCorrect();
+        correctCount++;
+      } else {
+        sndWrong();
+      }
+      currentIndex++;
+      renderCurrentStage();
     }
 
-    // 2. Multiple Choice
-    let currentChoices = [];
-    let currentCorrectIdx = 0;
+    // ==========================================
+    // 2. MULTIPLE CHOICE (10 SAVOL + INSTANT FEEDBACK)
+    // ==========================================
+    let mcLocked = false;
     function renderMultipleChoice(stage, stats) {
-      const item = vocabularyDeck[gameIndex % vocabularyDeck.length];
-      stats.innerText = `Savol: ${gameIndex + 1} / ${vocabularyDeck.length} | Ball: ${score}`;
+      if (currentIndex >= totalQuestions) {
+        showResultModal("Multiple Choice Yakunlandi!", "10 ta savoldan natijangiz:", correctCount, totalQuestions, correctCount * 10);
+        return;
+      }
 
-      const options = [item.uz_meaning, ...(item.distractors || ['boshqa 1', 'boshqa 2', 'boshqa 3'])].sort(() => Math.random() - 0.5);
-      currentChoices = options;
-      currentCorrectIdx = options.indexOf(item.uz_meaning);
+      mcLocked = false;
+      const item = gameSessionWords[currentIndex];
+      stats.innerHTML = `<span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-xl font-black text-xs">${currentIndex + 1} / ${totalQuestions} | Ball: ${correctCount * 10}</span>`;
+
+      // Variantlar
+      const rawOptions = [item.uz_meaning, ...(item.distractors || ['variant 1', 'variant 2', 'variant 3'])];
+      const shuffledOptions = [...rawOptions].sort(() => Math.random() - 0.5);
 
       stage.innerHTML = `
-        <div class="max-w-md w-full space-y-6 text-center">
-          <div>
-            <span class="text-xs text-emerald-400 font-bold uppercase tracking-wider">So'z ma'nosini toping</span>
-            <h2 class="text-3xl font-black text-white mt-1 capitalize">${item.word}</h2>
-            <p class="text-xs text-slate-400 italic mt-1">"${item.context_sentence}"</p>
+        <div class="max-w-md w-full space-y-6">
+          <div class="text-center">
+            <span class="text-[10px] text-emerald-400 font-black uppercase tracking-widest">Ma'nosini toping</span>
+            <h2 class="text-4xl font-black text-white mt-1 capitalize heading-font">${item.word}</h2>
+            <p class="text-xs text-slate-400 italic mt-2">"${item.context_sentence}"</p>
           </div>
-          <div class="grid grid-cols-1 gap-3">
-            ${options.map((opt, idx) => `
-              <button onclick="selectChoice(${idx})" class="w-full p-4 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-emerald-500/50 rounded-2xl text-sm font-semibold text-left transition flex items-center justify-between">
-                <span>${opt}</span>
-                <i class="fa-solid fa-angle-right text-slate-600"></i>
+
+          <div class="grid grid-cols-1 gap-3" id="mc-options-container">
+            ${shuffledOptions.map((opt, i) => `
+              <button onclick="handleMultipleChoiceClick(this, ${opt === item.uz_meaning})" class="mc-btn w-full p-4 bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl text-xs sm:text-sm font-bold text-left transition flex items-center justify-between group">
+                <span class="flex items-center gap-3">
+                  <span class="w-6 h-6 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center text-xs font-black">${String.fromCharCode(65 + i)}</span>
+                  <span class="text-slate-200 opt-text">${opt}</span>
+                </span>
+                <i class="fa-solid fa-angle-right text-slate-600 group-hover:text-emerald-400 transition"></i>
               </button>
             `).join('')}
           </div>
@@ -462,219 +760,334 @@
       `;
     }
 
-    function selectChoice(idx) {
-      if (idx === currentCorrectIdx) {
-        score += 10;
-        playTone(700, 'triangle', 0.2);
+    function handleMultipleChoiceClick(btn, isCorrect) {
+      if (mcLocked) return;
+      mcLocked = true;
+
+      const container = document.getElementById('mc-options-container');
+      const allBtns = container.querySelectorAll('.mc-btn');
+      const targetWord = gameSessionWords[currentIndex].uz_meaning;
+
+      if (isCorrect) {
+        sndCorrect();
+        correctCount++;
+        btn.classList.add('bg-emerald-950/70', 'border-emerald-500', 'text-emerald-300');
+        btn.querySelector('i').className = 'fa-solid fa-check text-emerald-400';
       } else {
-        playTone(200, 'sawtooth', 0.3);
+        sndWrong();
+        btn.classList.add('bg-rose-950/70', 'border-rose-500', 'text-rose-300', 'animate-shake');
+        btn.querySelector('i').className = 'fa-solid fa-xmark text-rose-400';
+
+        // To'g'ri variantni yashil qilib ko'rsatamiz
+        allBtns.forEach(b => {
+          if (b.querySelector('.opt-text').innerText.trim() === targetWord.trim()) {
+            b.classList.add('bg-emerald-950/40', 'border-emerald-500', 'text-emerald-400');
+            b.querySelector('i').className = 'fa-solid fa-check text-emerald-400';
+          }
+        });
       }
-      gameIndex++;
-      renderGame();
+
+      // 1.2 soniyadan so'ng avtomatik keyingi savolga o'tish
+      setTimeout(() => {
+        currentIndex++;
+        renderCurrentStage();
+      }, 1200);
     }
 
-    // 3. Matching Pairs
-    let selectedMatch = null;
+    // ==========================================
+    // 3. MATCHING PAIRS (NEON GRID + COMBO)
+    // ==========================================
+    let matchSelection = null;
+    let matchedPairsCount = 0;
+    let comboMultiplier = 1;
+
     function renderMatching(stage, stats) {
-      stats.innerText = `Juftliklar o'yini`;
-      const subset = vocabularyDeck.slice(0, 6);
-      
-      let tiles = [];
-      subset.forEach((item, idx) => {
-        tiles.push({ id: idx, text: item.word, type: 'word' });
-        tiles.push({ id: idx, text: item.uz_meaning, type: 'meaning' });
+      matchedPairsCount = 0;
+      comboMultiplier = 1;
+      const subset = gameSessionWords.slice(0, 6);
+      stats.innerHTML = `<span id="match-combo" class="px-3 py-1 bg-teal-500/10 text-teal-400 border border-teal-500/20 rounded-xl font-black text-xs">Juftliklar: 0 / 6</span>`;
+
+      let cards = [];
+      subset.forEach((it, idx) => {
+        cards.push({ id: idx, text: it.word, type: 'word' });
+        cards.push({ id: idx, text: it.uz_meaning, type: 'meaning' });
       });
-      tiles = tiles.sort(() => Math.random() - 0.5);
+      cards = cards.sort(() => Math.random() - 0.5);
 
       stage.innerHTML = `
-        <div class="grid grid-cols-3 sm:grid-cols-4 gap-3 max-w-xl w-full" id="matching-grid">
-          ${tiles.map(t => `
-            <button onclick="handleMatchTile(this, ${t.id}, '${t.type}')" data-id="${t.id}" data-type="${t.type}" class="tile-btn p-3 h-20 bg-slate-950 border border-slate-800 hover:border-teal-500 rounded-2xl text-xs font-bold text-center flex items-center justify-center transition">
-              ${t.text}
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-w-2xl w-full" id="matching-grid">
+          ${cards.map(c => `
+            <button onclick="handleMatchClick(this, ${c.id}, '${c.type}')" class="match-card p-3 min-h-[75px] bg-slate-950 border border-slate-800 hover:border-teal-500/60 rounded-2xl text-xs font-extrabold text-center flex items-center justify-center transition transform active:scale-95 shadow-md">
+              <span class="line-clamp-2">${c.text}</span>
             </button>
           `).join('')}
         </div>
       `;
     }
 
-    function handleMatchTile(btn, id, type) {
-      if (btn.classList.contains('matched') || btn.classList.contains('active-tile')) return;
+    function handleMatchClick(btn, id, type) {
+      if (btn.classList.contains('matched') || btn.classList.contains('selected')) return;
 
       playTone(500, 'sine', 0.05);
-      btn.classList.add('active-tile', 'border-teal-400', 'bg-teal-950/40');
+      btn.classList.add('selected', 'border-teal-400', 'bg-teal-950/60', 'text-teal-300');
 
-      if (!selectedMatch) {
-        selectedMatch = { btn, id, type };
+      if (!matchSelection) {
+        matchSelection = { btn, id, type };
       } else {
-        if (selectedMatch.type !== type && selectedMatch.id === id) {
-          playTone(800, 'sine', 0.2);
-          btn.classList.add('matched', 'opacity-0', 'pointer-events-none');
-          selectedMatch.btn.classList.add('matched', 'opacity-0', 'pointer-events-none');
+        if (matchSelection.type !== type && matchSelection.id === id) {
+          // To'g'ri juftlik
+          sndCorrect();
+          matchedPairsCount++;
+          btn.classList.add('matched', 'opacity-0', 'pointer-events-none', 'transition-all', 'duration-500');
+          matchSelection.btn.classList.add('matched', 'opacity-0', 'pointer-events-none', 'transition-all', 'duration-500');
+          document.getElementById('match-combo').innerText = `Juftliklar: ${matchedPairsCount} / 6 🔥 Combo x${comboMultiplier++}`;
+          
+          if (matchedPairsCount === 6) {
+            setTimeout(() => {
+              showResultModal("Matching Pairs Yakunlandi!", "Barcha juftliklar topildi!", 6, 6, 90);
+            }, 600);
+          }
         } else {
-          playTone(180, 'sawtooth', 0.2);
-          const first = selectedMatch.btn;
+          // Xato
+          sndWrong();
+          comboMultiplier = 1;
+          const prev = matchSelection.btn;
+          btn.classList.add('animate-shake', 'border-rose-500', 'bg-rose-950/40');
+          prev.classList.add('animate-shake', 'border-rose-500', 'bg-rose-950/40');
           setTimeout(() => {
-            first.classList.remove('active-tile', 'border-teal-400', 'bg-teal-950/40');
-            btn.classList.remove('active-tile', 'border-teal-400', 'bg-teal-950/40');
-          }, 400);
+            btn.classList.remove('selected', 'border-teal-400', 'bg-teal-950/60', 'text-teal-300', 'animate-shake', 'border-rose-500', 'bg-rose-950/40');
+            prev.classList.remove('selected', 'border-teal-400', 'bg-teal-950/60', 'text-teal-300', 'animate-shake', 'border-rose-500', 'bg-rose-950/40');
+          }, 450);
         }
-        selectedMatch = null;
+        matchSelection = null;
       }
     }
 
-    // 4. Fill the Gap
+    // ==========================================
+    // 4. FILL THE GAP (PRO LEVEL CONTEXT QUIZ)
+    // ==========================================
     function renderFillGap(stage, stats) {
-      const item = vocabularyDeck[gameIndex % vocabularyDeck.length];
-      stats.innerText = `Mashq: ${gameIndex + 1} / ${vocabularyDeck.length}`;
+      if (currentIndex >= totalQuestions) {
+        showResultModal("Fill The Gap Yakunlandi!", "Kontekst mashqlari muvaffaqiyatli topshirildi.", correctCount, totalQuestions, correctCount * 12);
+        return;
+      }
 
-      const regex = new RegExp(item.word, 'gi');
-      const gapped = item.context_sentence.replace(regex, '_______');
+      const item = gameSessionWords[currentIndex];
+      stats.innerHTML = `<span class="px-3 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-xl font-black text-xs">${currentIndex + 1} / ${totalQuestions}</span>`;
+
+      const reg = new RegExp(item.word, 'gi');
+      const gapped = item.context_sentence.replace(reg, '_______');
 
       stage.innerHTML = `
-        <div class="max-w-md w-full space-y-6 text-center">
-          <div class="bg-slate-950 p-6 rounded-3xl border border-amber-500/20">
-            <span class="text-xs text-amber-400 font-bold uppercase tracking-wider">O'rindiqni to'ldiring:</span>
-            <p class="text-base text-slate-200 font-medium mt-3 leading-relaxed">"${gapped}"</p>
-            <p class="text-xs text-slate-400 mt-3 font-semibold">Ma'nosi: ${item.uz_meaning}</p>
+        <div class="max-w-lg w-full space-y-6 text-center">
+          <div class="bg-slate-950 p-6 rounded-3xl border border-amber-500/20 text-left">
+            <span class="text-[10px] text-amber-400 font-black uppercase tracking-wider">Gapdagi bo'shliqni to'ldiring:</span>
+            <p class="text-base text-slate-200 font-semibold mt-3 leading-relaxed">"${gapped}"</p>
+            <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
+              <span class="text-slate-400 font-bold">Ma'nosi: <b class="text-amber-300">${item.uz_meaning}</b></span>
+              <span class="text-slate-500 font-mono">Bosh harf: <b>${item.word[0].toUpperCase()}... (${item.word.length} harf)</b></span>
+            </div>
           </div>
+
           <div class="flex gap-2">
-            <input type="text" id="gap-input" autofocus class="flex-1 bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-center text-sm font-bold text-white focus:outline-none focus:border-amber-400" placeholder="So'zni kiriting">
-            <button onclick="checkCurrentGap()" class="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-2xl transition">
+            <input type="text" id="gap-input" autofocus onkeydown="if(event.key==='Enter') checkGapAnswer()" class="flex-1 bg-slate-950 border border-slate-800 rounded-2xl px-5 py-3.5 text-center text-base font-black text-white focus:outline-none focus:border-amber-400 tracking-wider" placeholder="So'zni kiriting...">
+            <button onclick="checkGapAnswer()" class="px-6 py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-2xl transition">
               Tekshirish
             </button>
           </div>
         </div>
       `;
+      setTimeout(() => document.getElementById('gap-input')?.focus(), 50);
     }
 
-    function checkCurrentGap() {
-      const item = vocabularyDeck[gameIndex % vocabularyDeck.length];
-      const val = document.getElementById('gap-input').value.trim().toLowerCase();
+    function checkGapAnswer() {
+      const input = document.getElementById('gap-input');
+      const item = gameSessionWords[currentIndex];
+      const val = input.value.trim().toLowerCase();
+
       if (val === item.word.toLowerCase()) {
-        playTone(700, 'sine', 0.2);
-        score += 15;
+        sndCorrect();
+        correctCount++;
+        input.classList.add('border-emerald-500', 'bg-emerald-950/30');
       } else {
-        playTone(200, 'sawtooth', 0.25);
-        alert("To'g'ri javob: " + item.word);
+        sndWrong();
+        input.classList.add('border-rose-500', 'bg-rose-950/30', 'animate-shake');
+        alert(`To'g'ri javob: ${item.word}`);
       }
-      gameIndex++;
-      renderGame();
+
+      setTimeout(() => {
+        currentIndex++;
+        renderCurrentStage();
+      }, 500);
     }
 
-    // 5. Word Rush
-    let rushTime = 60;
-    function renderWordRush(stage, stats) {
-      rushTime = 60;
-      stats.innerHTML = `<span id="rush-timer" class="text-rose-400 font-black text-lg">60s</span> | Ball: <span id="rush-score">0</span>`;
+    // ==========================================
+    // 5. WORD RUSH (60s ARCADE SPEED)
+    // ==========================================
+    let rushTimeLeft = 60;
+    let rushScore = 0;
 
-      timerInterval = setInterval(() => {
-        rushTime--;
-        const timerEl = document.getElementById('rush-timer');
-        if (timerEl) timerEl.innerText = `${rushTime}s`;
-        if (rushTime <= 0) {
-          clearInterval(timerInterval);
-          alert(`Vaqt tugadi! Ochko: ${score}`);
-          closeGameArena();
+    function renderWordRush(stage, stats) {
+      rushTimeLeft = 60;
+      rushScore = 0;
+      stats.innerHTML = `<span class="text-rose-400 font-black text-base" id="rush-timer-badge">60s</span> | Ball: <span id="rush-score-badge" class="font-bold text-white">0</span>`;
+
+      gameTimer = setInterval(() => {
+        rushTimeLeft--;
+        const badge = document.getElementById('rush-timer-badge');
+        if (badge) badge.innerText = `${rushTimeLeft}s`;
+        if (rushTimeLeft <= 0) {
+          clearInterval(gameTimer);
+          showResultModal("Vaqt Tugadi!", `Word Rush shiddati! Sizning to'plagan ochkongiz: ${rushScore}`, rushScore / 10, totalQuestions, rushScore);
         }
       }, 1000);
 
-      nextRushQuestion(stage);
+      nextRushWord(stage);
     }
 
-    function nextRushQuestion(stage) {
-      const item = vocabularyDeck[Math.floor(Math.random() * vocabularyDeck.length)];
-      const isCorrectOption = Math.random() > 0.5;
-      const displayMeaning = isCorrectOption ? item.uz_meaning : "butunlay boshqa tarjima";
+    function nextRushWord(stage) {
+      const item = gameSessionWords[Math.floor(Math.random() * gameSessionWords.length)];
+      const isCorrectMeaning = Math.random() > 0.5;
+      const displayMeaning = isCorrectMeaning ? item.uz_meaning : "butunlay boshqa tarjima";
 
       stage.innerHTML = `
         <div class="max-w-md w-full space-y-8 text-center">
           <div>
-            <h2 class="text-4xl font-black text-white capitalize">${item.word}</h2>
-            <p class="text-lg text-slate-300 font-semibold mt-3">= "${displayMeaning}"</p>
+            <span class="text-[10px] text-rose-400 font-black uppercase tracking-widest">To'g'rimi yoki Xato?</span>
+            <h2 class="text-4xl font-black text-white capitalize heading-font mt-1">${item.word}</h2>
+            <p class="text-xl text-slate-300 font-extrabold mt-3">= "${displayMeaning}"</p>
           </div>
-          <div class="flex gap-4 justify-center">
-            <button onclick="answerRush(${isCorrectOption})" class="px-8 py-4 bg-emerald-600 hover:bg-emerald-500 font-bold rounded-2xl text-lg transition flex-1">
-              <i class="fa-solid fa-check mr-2"></i> To'g'ri
+
+          <div class="flex gap-4">
+            <button onclick="handleRushChoice(false, ${isCorrectMeaning})" class="flex-1 py-4 bg-rose-600/90 hover:bg-rose-500 font-black rounded-2xl text-base transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-xmark"></i> XATO (◀)
             </button>
-            <button onclick="answerRush(${!isCorrectOption})" class="px-8 py-4 bg-rose-600 hover:bg-rose-500 font-bold rounded-2xl text-lg transition flex-1">
-              <i class="fa-solid fa-xmark mr-2"></i> Xato
+            <button onclick="handleRushChoice(true, ${isCorrectMeaning})" class="flex-1 py-4 bg-emerald-600/90 hover:bg-emerald-500 font-black rounded-2xl text-base transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-check"></i> TO'G'RI (▶)
             </button>
           </div>
+          <p class="text-[11px] text-slate-500">Klaviaturadagi strelkalar orqali tezkor boshqarish mumkin</p>
         </div>
       `;
     }
 
-    function answerRush(userAnswerCorrect) {
-      if (userAnswerCorrect) {
-        rushTime += 1;
-        score += 10;
-        playTone(800, 'sine', 0.1);
+    function handleRushChoice(userSaidTrue, actuallyTrue) {
+      if (userSaidTrue === actuallyTrue) {
+        sndCorrect();
+        rushTimeLeft += 2;
+        rushScore += 10;
       } else {
-        rushTime = Math.max(0, rushTime - 3);
-        playTone(180, 'sawtooth', 0.2);
+        sndWrong();
+        rushTimeLeft = Math.max(0, rushTimeLeft - 3);
       }
-      const scoreEl = document.getElementById('rush-score');
-      if (scoreEl) scoreEl.innerText = score;
-      nextRushQuestion(document.getElementById('game-stage'));
+      document.getElementById('rush-score-badge').innerText = rushScore;
+      nextRushWord(document.getElementById('game-stage'));
     }
 
-    // 6. Typing Race
+    // ==========================================
+    // 6. TYPING RACE (MONKEYTYPE STYLE PRO)
+    // ==========================================
+    let typingTarget = "";
     function renderTypingRace(stage, stats) {
-      const item = vocabularyDeck[gameIndex % vocabularyDeck.length];
-      stats.innerText = `So'z: ${gameIndex + 1} / ${vocabularyDeck.length}`;
+      if (currentIndex >= totalQuestions) {
+        showResultModal("Typing Race Yakunlandi!", "So'zlarni yozish imlosi to'liq mustahkamlandi.", totalQuestions, totalQuestions, 100);
+        return;
+      }
+
+      const item = gameSessionWords[currentIndex];
+      typingTarget = item.word;
+      stats.innerHTML = `<span class="px-3 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-xl font-black text-xs">${currentIndex + 1} / ${totalQuestions}</span>`;
 
       stage.innerHTML = `
         <div class="max-w-md w-full space-y-6 text-center">
           <div>
-            <span class="text-xs text-indigo-400 font-bold uppercase">Tezkor terish (Typing)</span>
-            <p class="text-xl font-bold text-slate-200 mt-2">${item.uz_meaning}</p>
-            <p class="text-xs text-slate-400 italic mt-1">${item.en_meaning}</p>
+            <span class="text-[10px] text-indigo-400 font-black uppercase tracking-widest">O'zbekcha Ma'nosi:</span>
+            <p class="text-2xl font-black text-white mt-1 capitalize">${item.uz_meaning}</p>
+            <p class="text-xs text-slate-400 italic mt-1 font-mono">${item.phonetic || ''}</p>
           </div>
-          <div>
-            <input type="text" id="typing-input" autofocus oninput="checkTypingLive(this)" class="w-full bg-slate-950 border-2 border-indigo-500/30 rounded-2xl p-4 text-center text-xl font-black text-white focus:outline-none focus:border-indigo-400 tracking-widest" placeholder="${item.word[0]}...">
+
+          <!-- Monkeytype uslubidagi harflar vitrinasi -->
+          <div id="typing-display" class="p-4 bg-slate-950 border-2 border-indigo-500/30 rounded-2xl text-3xl font-black tracking-widest font-mono text-slate-500 flex justify-center gap-1">
+            ${typingTarget.split('').map((char, i) => `<span id="char-${i}">${char}</span>`).join('')}
           </div>
+
+          <input type="text" id="monkey-input" autofocus oninput="handleMonkeyType(this)" class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-center text-xl font-black text-white focus:outline-none focus:border-indigo-400 tracking-widest font-mono" placeholder="Shu yerga yozing..." autocomplete="off">
         </div>
       `;
+      setTimeout(() => document.getElementById('monkey-input')?.focus(), 50);
     }
 
-    function checkTypingLive(input) {
-      const item = vocabularyDeck[gameIndex % vocabularyDeck.length];
-      if (input.value.trim().toLowerCase() === item.word.toLowerCase()) {
-        playTone(700, 'sine', 0.15);
+    function handleMonkeyType(input) {
+      const val = input.value;
+      let allCorrect = true;
+
+      for (let i = 0; i < typingTarget.length; i++) {
+        const charEl = document.getElementById(`char-${i}`);
+        if (!charEl) continue;
+
+        if (i < val.length) {
+          if (val[i].toLowerCase() === typingTarget[i].toLowerCase()) {
+            charEl.className = 'text-emerald-400';
+          } else {
+            charEl.className = 'text-rose-500 underline';
+            allCorrect = false;
+          }
+        } else {
+          charEl.className = 'text-slate-500';
+          allCorrect = false;
+        }
+      }
+
+      if (val.toLowerCase() === typingTarget.toLowerCase()) {
+        sndCorrect();
         input.classList.add('border-emerald-400', 'bg-emerald-950/20');
         setTimeout(() => {
-          gameIndex++;
-          renderGame();
+          currentIndex++;
+          renderCurrentStage();
         }, 300);
       }
     }
 
-    // 7. Sentence Builder
-    let builtTokens = [];
+    // ==========================================
+    // 7. SENTENCE BUILDER (SYNTAX ENGINE)
+    // ==========================================
+    let assembledTokens = [];
     function renderSentenceBuilder(stage, stats) {
-      const item = vocabularyDeck[gameIndex % vocabularyDeck.length];
-      stats.innerText = `Gap tuzish: ${gameIndex + 1} / ${vocabularyDeck.length}`;
+      if (currentIndex >= totalQuestions) {
+        showResultModal("Sentence Builder Yakunlandi!", "Grammatik sintaksis mukammal darajaga yetkazildi.", totalQuestions, totalQuestions, 120);
+        return;
+      }
 
-      const rawTokens = item.context_sentence.replace(/[^\w\s]/gi, "").split(/\s+/).filter(Boolean);
-      const shuffled = [...rawTokens].sort(() => Math.random() - 0.5);
-      builtTokens = [];
+      const item = gameSessionWords[currentIndex];
+      stats.innerHTML = `<span class="px-3 py-1 bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20 rounded-xl font-black text-xs">${currentIndex + 1} / ${totalQuestions}</span>`;
+
+      const rawWords = item.context_sentence.replace(/[^\w\s]/gi, "").split(/\s+/).filter(Boolean);
+      const shuffled = [...rawWords].sort(() => Math.random() - 0.5);
+      assembledTokens = [];
 
       stage.innerHTML = `
-        <div class="max-w-lg w-full space-y-6">
+        <div class="max-w-xl w-full space-y-6">
           <div class="text-center">
-            <span class="text-xs text-fuchsia-400 font-bold uppercase">Gapni to'g'ri tartibda yig'ing</span>
-            <p class="text-xs text-slate-400 mt-1">So'zlarni bosib ketma-ket joylashtiring</p>
+            <span class="text-[10px] text-fuchsia-400 font-black uppercase tracking-widest">Jumlani to'g'ri tartibda yig'ing</span>
+            <p class="text-xs text-slate-400 mt-1">So'zlarni bosib yuqoriga chiqaring. Qaytarish uchun yuqoridagi so'zni bosing.</p>
           </div>
-          <div id="built-zone" class="min-h-[60px] p-4 bg-slate-950 border border-fuchsia-500/30 rounded-2xl flex flex-wrap gap-2 items-center"></div>
-          <div id="source-zone" class="flex flex-wrap gap-2 justify-center">
-            ${shuffled.map(tok => `
-              <button onclick="pickToken(this, '${tok}')" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold rounded-xl text-slate-200 transition">
-                ${tok}
+
+          <!-- Yig'ilgan jumla maydoni -->
+          <div id="sentence-dropzone" class="min-h-[70px] p-4 bg-slate-950 border-2 border-dashed border-fuchsia-500/30 rounded-2xl flex flex-wrap gap-2 items-center">
+            <span id="placeholder-hint" class="text-xs text-slate-600 font-semibold italic">Bo'laklarni pastdan tanlang...</span>
+          </div>
+
+          <!-- Tanlash uchun so'z bloklari -->
+          <div id="tokens-pool" class="flex flex-wrap gap-2 justify-center">
+            ${shuffled.map((token, idx) => `
+              <button onclick="pickSentenceToken(this, '${token}')" class="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-xs font-black rounded-xl text-slate-200 transition transform active:scale-95 shadow">
+                ${token}
               </button>
             `).join('')}
           </div>
+
           <div class="text-center pt-2">
-            <button onclick="checkCurrentSentence()" class="px-6 py-2.5 bg-fuchsia-600 hover:bg-fuchsia-500 font-bold rounded-xl text-xs transition">
+            <button onclick="verifyAssembledSentence()" class="px-8 py-3 bg-fuchsia-600 hover:bg-fuchsia-500 font-black rounded-xl text-xs transition">
               Tekshirish
             </button>
           </div>
@@ -682,36 +1095,46 @@
       `;
     }
 
-    function pickToken(btn, token) {
-      playTone(550, 'sine', 0.08);
+    function pickSentenceToken(btn, word) {
+      playTone(550, 'sine', 0.05);
       btn.classList.add('opacity-0', 'pointer-events-none');
-      builtTokens.push({ token, sourceBtn: btn });
-      
-      const builtZone = document.getElementById('built-zone');
-      const badge = document.createElement('span');
-      badge.className = 'px-3 py-1.5 bg-fuchsia-950 border border-fuchsia-500/40 text-fuchsia-300 text-xs font-bold rounded-xl';
-      badge.innerText = token;
-      builtZone.appendChild(badge);
+      assembledTokens.push({ word, btnRef: btn });
+
+      const dropzone = document.getElementById('sentence-dropzone');
+      document.getElementById('placeholder-hint')?.remove();
+
+      const chip = document.createElement('button');
+      chip.className = 'px-3 py-1.5 bg-fuchsia-950 border border-fuchsia-500/50 text-fuchsia-300 text-xs font-black rounded-xl hover:bg-fuchsia-900 transition';
+      chip.innerText = word;
+      chip.onclick = () => {
+        // Yuqoridan olib tashlash
+        chip.remove();
+        btn.classList.remove('opacity-0', 'pointer-events-none');
+        assembledTokens = assembledTokens.filter(t => t.btnRef !== btn);
+      };
+      dropzone.appendChild(chip);
     }
 
-    function checkCurrentSentence() {
-      const item = vocabularyDeck[gameIndex % vocabularyDeck.length];
+    function verifyAssembledSentence() {
+      const item = gameSessionWords[currentIndex];
       const cleanOriginal = item.context_sentence.replace(/[^\w\s]/gi, "").split(/\s+/).filter(Boolean).join(' ');
-      const userSentence = builtTokens.map(t => t.token).join(' ');
+      const userResult = assembledTokens.map(t => t.word).join(' ');
 
-      if (userSentence.toLowerCase() === cleanOriginal.toLowerCase()) {
-        playTone(800, 'sine', 0.2);
+      if (userResult.toLowerCase() === cleanOriginal.toLowerCase()) {
+        sndCorrect();
+        correctCount++;
         alert("Ajoyib! Gap to'g'ri yig'ildi!");
-        gameIndex++;
-        renderGame();
+        currentIndex++;
+        renderCurrentStage();
       } else {
-        playTone(200, 'sawtooth', 0.25);
-        alert("Tartibda xatolik bor. Qaytadan urinib ko'ring.");
-        renderGame();
+        sndWrong();
+        alert("Tartibda noaniqlik bor. Qaytadan urinib ko'ring!");
       }
     }
 
-    // READING RASM SKANER (Avtomatik siqish bilan)
+    // ==========================================
+    // SKANER: KAMIDA 10 TA SO'Z VA SARLAVHA YARATISH
+    // ==========================================
     function compressImage(file, callback) {
       const reader = new FileReader();
       reader.onload = function(e) {
@@ -721,7 +1144,6 @@
           let width = img.width;
           let height = img.height;
           const maxDim = 1200;
-
           if (width > maxDim || height > maxDim) {
             if (width > height) {
               height = Math.round((height * maxDim) / width);
@@ -731,7 +1153,6 @@
               height = maxDim;
             }
           }
-
           canvas.width = width;
           canvas.height = height;
           const ctx = canvas.getContext('2d');
@@ -757,18 +1178,38 @@
           const response = await fetch('/api/ai', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              image: optimizedBase64
-            })
+            body: JSON.stringify({ image: optimizedBase64 })
           });
 
           const data = await response.json();
           if (!response.ok) throw new Error(data.error || 'Server xatosi');
 
-          if (Array.isArray(data) && data.length > 0) {
-            vocabularyDeck = data;
-            document.getElementById('total-words-badge').innerText = `${vocabularyDeck.length} ta so'z`;
-            alert(`Ajoyib! Matndan ${data.length} ta B2/C1 darajadagi so'zlar ajratib olindi va 7 ta mini-o'yinga yuklandi!`);
+          let wordsList = [];
+          let deckTitle = "YANGI READING TO'PLAM";
+
+          if (data && data.words && Array.isArray(data.words)) {
+            wordsList = data.words;
+            deckTitle = data.title || "CAMBRIDGE READING PASSAGE";
+          } else if (Array.isArray(data)) {
+            wordsList = data;
+          }
+
+          if (wordsList.length > 0) {
+            const newDeck = {
+              id: 'deck-' + Date.now(),
+              title: deckTitle.toUpperCase(),
+              date: new Date().toISOString().split('T')[0],
+              words: wordsList
+            };
+
+            // Yangi to'plamni ro'yxat boshiga qo'shamiz
+            decks.unshift(newDeck);
+            activeDeckId = newDeck.id;
+            saveDecks();
+            initDeckUI();
+
+            sndComplete();
+            alert(`Muvaffaqiyatli! "${newDeck.title}" nomli yangi to'plam yaratildi va ${wordsList.length} ta B2/C1 so'zlar 7 ta mini-o'yinga ulandi!`);
             switchTab('vocab');
           }
         } catch (err) {
@@ -778,6 +1219,17 @@
         }
       });
     }
+
+    // Klaviatura tinglovchisi (Word rush uchun)
+    window.addEventListener('keydown', (e) => {
+      if (currentGame === 'word-rush' && !document.getElementById('game-arena').classList.contains('hidden')) {
+        if (e.key === 'ArrowLeft') handleRushChoice(false, null);
+        if (e.key === 'ArrowRight') handleRushChoice(true, null);
+      }
+    });
+
+    // Boshlang'ich yuklash
+    initDeckUI();
   </script>
 </body>
 </html>
