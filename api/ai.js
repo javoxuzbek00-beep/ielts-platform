@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Faqat POST so\'rovlar qabul qilinadi' });
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Faqat POST qabul qilinadi' });
 
   const rawKey = process.env.GEMINI_API_KEY;
   if (!rawKey) return res.status(500).json({ error: 'Vercel sozlamalarida GEMINI_API_KEY topilmadi' });
@@ -22,28 +22,25 @@ export default async function handler(req, res) {
       cleanBase64 = parts[1];
     }
 
-    const prompt = `
-      You are an expert Cambridge IELTS Academic teacher.
-      Analyze this Reading passage page image:
-      1. Create a short, relevant TOPIC TITLE in CAPITAL LETTERS based on the passage (e.g. "WEANING & INFANT DIET", "URBAN MIGRATION").
-      2. Extract 10 to 14 essential B2/C1 academic vocabulary words or collocations from this text.
-      3. For each word give: word, IPA phonetic, English meaning, Uzbek meaning, exact sentence from the text, and 3 Uzbek distractors.
+    const prompt = `Analyze this IELTS Reading passage page image carefully.
+1. Determine the main theme and create a concise TOPIC TITLE in CAPITAL LETTERS (e.g. "WEANING & INFANT HEALTH", "URBAN MIGRATION").
+2. Extract at least 10 to 14 essential B2/C1 academic vocabulary words or collocations from this text.
+3. For each word give: word, IPA phonetic transcription, English meaning, accurate Uzbek translation, the authentic sentence from the text, and 3 incorrect Uzbek distractors.
 
-      Respond ONLY with valid JSON using this format:
-      {
-        "title": "TOPIC TITLE",
-        "words": [
-          {
-            "word": "example",
-            "phonetic": "/ɪɡˈzɑːmpl/",
-            "en_meaning": "a representative form or pattern",
-            "uz_meaning": "namuna, misol",
-            "context_sentence": "This is an authentic sentence from the text.",
-            "distractors": ["variant 1", "variant 2", "variant 3"]
-          }
-        ]
-      }
-    `;
+Return ONLY a raw JSON object matching this schema:
+{
+  "title": "TOPIC TITLE",
+  "words": [
+    {
+      "word": "mitigate",
+      "phonetic": "/ˈmɪtɪɡeɪt/",
+      "en_meaning": "To make something less severe",
+      "uz_meaning": "yumshatmoq, ta'sirini kamaytirmoq",
+      "context_sentence": "Authentic sentence from the text",
+      "distractors": ["noto'g'ri 1", "noto'g'ri 2", "noto'g'ri 3"]
+    }
+  ]
+}`;
 
     const payload = {
       contents: [{
@@ -54,19 +51,18 @@ export default async function handler(req, res) {
         ]
       }],
       generationConfig: {
-        responseMimeType: "application/json",
-        temperature: 0.2
+        responseMimeType: "application/json"
       }
     };
 
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
-
+    // 1-o'rinda: gemini-3.5-flash-lite (Hujjatlarni o'qish uchun eng tezkor, yuklamasiz)
+    // 2-o'rinda: gemini-3.8-flash (Zaxira)
+    const modelsToTry = ['gemini-3.5-flash-lite', 'gemini-3.8-flash'];
     let lastError = null;
-    const maxRetries = 3;
 
-    // High demand bo'lsa 3 martagacha avtomatik qayta so'rov yuborish
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    for (const model of modelsToTry) {
       try {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
         const response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -77,48 +73,37 @@ export default async function handler(req, res) {
 
         if (response.ok && data?.candidates?.[0]?.content?.parts?.[0]?.text) {
           const rawText = data.candidates[0].content.parts[0].text;
-          
-          // Aqlli JSON tozalash va o'qish (Hech qachon xato bermaydi)
-          let parsedData = null;
+          let parsed = null;
           try {
-            parsedData = JSON.parse(rawText);
+            parsed = JSON.parse(rawText);
           } catch (_) {
-            const jsonMatch = rawText.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
-            if (jsonMatch) {
-              parsedData = JSON.parse(jsonMatch[0]);
-            }
+            const match = rawText.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
+            if (match) parsed = JSON.parse(match[0]);
           }
 
-          if (parsedData) {
-            // Agar model shunchaki massiv qaytarsa ham moslab beramiz
-            if (Array.isArray(parsedData)) {
+          if (parsed) {
+            if (Array.isArray(parsed)) {
               return res.status(200).json({
                 title: "IELTS READING PASSAGE",
-                words: parsedData
+                words: parsed
               });
             }
-            return res.status(200).json(parsedData);
+            return res.status(200).json(parsed);
           }
         }
 
-        const msg = data?.error?.message || `Server javob bermadi (${response.status})`;
-        lastError = msg;
-
-        // Agar server band bo'lsa (high demand), biroz kutib yana urunadi
-        if (attempt < maxRetries) {
-          await new Promise(r => setTimeout(r, 1500 * attempt));
-        }
+        lastError = data?.error?.message || `Model ${model} xatosi (${response.status})`;
+        
+        // Agar bu model band bo'lsa, kutmasdan darhol zaxiradagisiga o'tadi
       } catch (err) {
         lastError = err.message;
-        if (attempt < maxRetries) {
-          await new Promise(r => setTimeout(r, 1500 * attempt));
-        }
       }
     }
 
-    return res.status(500).json({ error: lastError || 'AI javob bermadi, qayta urinib ko\'ring' });
+    // Hech qanday behuda kutishlarsiz zudlik bilan javob qaytarish
+    return res.status(500).json({ error: lastError || 'AI serveridan tezkor javob olinmadi' });
 
   } catch (error) {
-    return res.status(500).json({ error: 'Server xatosi: ' + error.message });
+    return res.status(500).json({ error: error.message });
   }
 }
