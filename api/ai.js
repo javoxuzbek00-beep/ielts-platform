@@ -11,10 +11,12 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Faqat POST so\'rovlar qabul qilinadi' });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({ error: 'GEMINI_API_KEY topilmadi. Vercel sozlamalarini tekshiring.' });
+  const rawKey = process.env.GEMINI_API_KEY;
+  if (!rawKey) {
+    return res.status(500).json({ error: 'Vercel sozlamalarida GEMINI_API_KEY topilmadi' });
   }
+  // Kalitdagi har qanday ortiqcha bo'sh joy yoki belgilarni tozalash
+  const apiKey = rawKey.trim().replace(/^["']|["']$/g, '');
 
   const { type, image, question, answer } = req.body;
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
@@ -26,7 +28,7 @@ export default async function handler(req, res) {
       let cleanBase64 = image;
       let mimeType = 'image/jpeg';
 
-      if (image.includes(';base64,')) {
+      if (image && image.includes(';base64,')) {
         const parts = image.split(';base64,');
         mimeType = parts[0].replace('data:', '') || 'image/jpeg';
         cleanBase64 = parts[1];
@@ -50,6 +52,7 @@ export default async function handler(req, res) {
 
       payload = {
         contents: [{
+          role: "user",
           parts: [
             { text: prompt },
             {
@@ -82,7 +85,10 @@ export default async function handler(req, res) {
       `;
 
       payload = {
-        contents: [{ parts: [{ text: prompt }] }],
+        contents: [{
+          role: "user",
+          parts: [{ text: prompt }]
+        }],
         generationConfig: {
           responseMimeType: "application/json"
         }
@@ -99,15 +105,24 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    if (!response.ok || !data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
-      return res.status(500).json({ error: 'Gemini tahlil qila olmadi', details: data });
+    // Agar Google rad etsa, Google'ning asl xato xabarini qaytaramiz
+    if (!response.ok) {
+      const errorMsg = data?.error?.message || `Google API xatosi (${response.status})`;
+      return res.status(500).json({ error: errorMsg, details: data });
     }
 
-    const result = JSON.parse(data.candidates[0].content.parts[0].text);
+    if (!data.candidates || !data.candidates[0]?.content?.parts?.[0]?.text) {
+      const finishReason = data?.candidates?.[0]?.finishReason || 'Javob bo\'sh qaytdi';
+      return res.status(500).json({ error: `AI tahlil qila olmadi (Sabab: ${finishReason})`, details: data });
+    }
+
+    const rawText = data.candidates[0].content.parts[0].text;
+    const cleanJson = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
+    const result = JSON.parse(cleanJson);
     return res.status(200).json(result);
 
   } catch (error) {
     console.error("AI Error:", error);
-    return res.status(500).json({ error: 'Server xatoligi: ' + error.message });
+    return res.status(500).json({ error: 'Xatolik: ' + error.message });
   }
 }
