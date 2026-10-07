@@ -31,9 +31,6 @@
     .card-back {
       transform: rotateY(180deg);
     }
-    .pulse-glow {
-      box-shadow: 0 0 25px rgba(59, 130, 246, 0.5);
-    }
     .scanner-line {
       animation: scan 2s infinite ease-in-out;
     }
@@ -46,7 +43,7 @@
 </head>
 <body class="p-4 md:p-8">
 
-  <!-- Yuqori panel: Streak, O'sish va Bo'limlar -->
+  <!-- Yuqori panel: Header -->
   <header class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-800">
     <div class="flex items-center gap-3">
       <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-xl font-bold shadow-lg shadow-blue-500/20">
@@ -58,7 +55,7 @@
       </div>
     </div>
 
-    <!-- Streak va Progress (4 & 5-rasmlar mexanikasi) -->
+    <!-- Streak va Progress -->
     <div class="flex items-center gap-4 bg-slate-900/80 border border-slate-800 px-4 py-2 rounded-2xl backdrop-blur-md">
       <div class="flex items-center gap-2">
         <span class="text-orange-500 text-lg"><i class="fa-solid fa-fire"></i></span>
@@ -95,7 +92,7 @@
     <!-- 1. VOCABULARY BO'LIMI (7 TA MINI O'YIN) -->
     <section id="section-vocab" class="space-y-6">
       
-      <!-- O'yinlar tanlash paneli (1 & 14-rasmdagi 7 ta karta) -->
+      <!-- O'yinlar tanlash paneli -->
       <div id="games-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- 1. Flashcards -->
         <div onclick="startGame('flashcards')" class="cursor-pointer group relative bg-gradient-to-b from-blue-900/40 to-slate-900/90 border border-blue-500/20 hover:border-blue-500 p-5 rounded-3xl transition-all duration-300 hover:-translate-y-1 shadow-xl">
@@ -105,7 +102,7 @@
           <h3 class="font-bold text-base text-white group-hover:text-blue-400 transition">Flashcards</h3>
           <p class="text-xs text-slate-400 mt-1 leading-relaxed">Kartani aylantiring. O'ngga suring - bilasiz, chapga - qayta o'rganish.</p>
           <div class="mt-4 flex items-center justify-between text-[11px] font-semibold text-blue-400">
-            <span><i class="fa-solid fa-hand-pointer mr-1"></i> Flip / Swipe</span>
+            <span>Flip / Swipe</span>
             <i class="fa-solid fa-arrow-right opacity-0 group-hover:opacity-100 transition"></i>
           </div>
         </div>
@@ -188,22 +185,22 @@
           </div>
         </div>
 
-        <!-- Bazadagi so'zlar statistikasi -->
+        <!-- Lug'at statistikasi -->
         <div class="bg-slate-900/80 border border-slate-800 p-5 rounded-3xl flex flex-col justify-between">
           <div>
             <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
               <span>Faol Lug'at Bazasida:</span>
-              <span id="total-words-badge" class="font-bold text-blue-400">8 ta so'z</span>
+              <span id="total-words-badge" class="font-bold text-blue-400">6 ta so'z</span>
             </div>
-            <p class="text-xs text-slate-500">Spaced Repetition tartibi: 1, 3, 7, 16 va 35-kunlar[cite: 1]. Yangi rasm skaner qilinsa bazaga qo'shiladi.</p>
+            <p class="text-xs text-slate-500 leading-relaxed">Spaced Repetition tartibi: 1, 3, 7, 16 va 35-kunlar. Rasm skaner qilinsa, yangi so'zlar avtomatik shu yerga qo'shiladi.</p>
           </div>
-          <button onclick="switchTab('scanner')" class="mt-4 w-full py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold rounded-xl transition">
+          <button onclick="switchTab('scanner')" class="mt-4 w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-xs font-bold rounded-xl transition">
             + Yangi Reading Matn Yuklash
           </button>
         </div>
       </div>
 
-      <!-- O'yin Arena Konteyneri (Har bir o'yin shu yerda ochiladi) -->
+      <!-- O'yin Arena Konteyneri -->
       <div id="game-arena" class="hidden bg-slate-900/90 border border-slate-800 p-6 md:p-8 rounded-3xl shadow-2xl relative">
         <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-800">
           <div class="flex items-center gap-3">
@@ -215,7 +212,6 @@
           <div id="game-stats" class="text-sm font-bold text-blue-400"></div>
         </div>
 
-        <!-- Dinamik kontent maydoni -->
         <div id="game-stage" class="min-h-[350px] flex flex-col items-center justify-center"></div>
       </div>
     </section>
@@ -240,7 +236,7 @@
             </label>
           </div>
 
-          <!-- Skaner animatsiyasi va oldindan ko'rish -->
+          <!-- Skaner animatsiyasi -->
           <div id="scan-preview-box" class="hidden mt-6 relative max-w-md mx-auto rounded-2xl overflow-hidden border border-blue-500/40">
             <img id="scan-preview-img" src="" alt="Reading text" class="w-full h-auto opacity-70">
             <div id="laser-line" class="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent scanner-line"></div>
@@ -263,11 +259,10 @@
             </div>
             <div>
               <h2 class="text-xl font-black">Maya — IELTS Speaking Imtihon Oluvchi</h2>
-              <p class="text-xs text-slate-400">Part 1, 2, 3 bo'yicha jonli tahlil va Band 8.5 rephrasing[cite: 11]</p>
+              <p class="text-xs text-slate-400">Part 1, 2, 3 bo'yicha jonli tahlil va Band 8.5 rephrasing</p>
             </div>
           </div>
 
-          <!-- Savol kartasi -->
           <div class="bg-slate-950/70 border border-slate-800 p-5 rounded-2xl">
             <p class="text-xs uppercase font-bold text-pink-400 mb-1">Imtihon Savoli:</p>
             <h3 id="speaking-question" class="text-lg font-bold text-white">"Do you think artificial intelligence will change the way students learn languages?"</h3>
@@ -276,7 +271,6 @@
             </button>
           </div>
 
-          <!-- Ovoz yozish boshqaruvi -->
           <div class="flex flex-col items-center justify-center gap-3 py-4">
             <button id="mic-btn" onclick="toggleRecording()" class="w-20 h-20 rounded-full bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center text-2xl shadow-xl shadow-rose-600/30 transition transform active:scale-95">
               <i id="mic-icon" class="fa-solid fa-microphone"></i>
@@ -284,7 +278,6 @@
             <p id="mic-status" class="text-xs text-slate-400 font-semibold">Javob berish uchun mikrofonni bosing</p>
           </div>
 
-          <!-- O'quvchi javobi matni -->
           <div class="space-y-2">
             <label class="text-xs font-bold text-slate-400">Sizning Javobingiz (Transkripsiya):</label>
             <textarea id="speech-transcript" rows="3" class="w-full bg-slate-950/90 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 focus:outline-none focus:border-rose-500 transition" placeholder="Mikrofonni yoqib gapiring yoki javobingizni shu yerga yozing..."></textarea>
@@ -294,7 +287,6 @@
             Javobni Mayaga Yuborish & Baholash
           </button>
 
-          <!-- Maya Feedback Natijasi -->
           <div id="maya-feedback-box" class="hidden bg-slate-950 border border-slate-800 p-6 rounded-2xl space-y-4">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
               <span class="text-sm font-bold text-slate-300">Maya Natijasi:</span>
@@ -316,9 +308,8 @@
 
   </main>
 
-  <!-- JAVASCRIPT YADRO LOGIKASI -->
+  <!-- JAVASCRIPT LOGIKASI -->
   <script>
-    // Dastlabki asosiy lug'at bazasi (Rasm yuklanmasa ham o'yinlar darhol ishlashi uchun)
     let vocabularyDeck = [
       {
         word: "deteriorate",
@@ -370,7 +361,6 @@
       }
     ];
 
-    // Audio sintez (TTS)
     function playTTS(text) {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
@@ -381,7 +371,6 @@
       }
     }
 
-    // Audio effektlar (Web Audio API)
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     function playTone(freq, type, duration) {
       try {
@@ -398,7 +387,6 @@
       } catch(e) {}
     }
 
-    // Tab almashtirish
     function switchTab(tab) {
       ['vocab', 'scanner', 'speaking'].forEach(t => {
         document.getElementById(`section-${t}`).classList.add('hidden');
@@ -451,24 +439,16 @@
       const stats = document.getElementById('game-stats');
       stage.innerHTML = '';
 
-      if (currentGame === 'flashcards') {
-        renderFlashcards(stage, stats);
-      } else if (currentGame === 'multiple-choice') {
-        renderMultipleChoice(stage, stats);
-      } else if (currentGame === 'matching') {
-        renderMatching(stage, stats);
-      } else if (currentGame === 'fill-gap') {
-        renderFillGap(stage, stats);
-      } else if (currentGame === 'word-rush') {
-        renderWordRush(stage, stats);
-      } else if (currentGame === 'typing-race') {
-        renderTypingRace(stage, stats);
-      } else if (currentGame === 'sentence-builder') {
-        renderSentenceBuilder(stage, stats);
-      }
+      if (currentGame === 'flashcards') renderFlashcards(stage, stats);
+      else if (currentGame === 'multiple-choice') renderMultipleChoice(stage, stats);
+      else if (currentGame === 'matching') renderMatching(stage, stats);
+      else if (currentGame === 'fill-gap') renderFillGap(stage, stats);
+      else if (currentGame === 'word-rush') renderWordRush(stage, stats);
+      else if (currentGame === 'typing-race') renderTypingRace(stage, stats);
+      else if (currentGame === 'sentence-builder') renderSentenceBuilder(stage, stats);
     }
 
-    // 1. Flashcards (Flip / Spaced Repetition)
+    // 1. Flashcards
     function renderFlashcards(stage, stats) {
       const item = vocabularyDeck[gameIndex % vocabularyDeck.length];
       stats.innerText = `Karta: ${gameIndex + 1} / ${vocabularyDeck.length}`;
@@ -476,7 +456,6 @@
       stage.innerHTML = `
         <div class="card-flip w-full max-w-md h-80 cursor-pointer" onclick="this.querySelector('.card-inner').classList.toggle('flipped')">
           <div class="card-inner relative w-full h-full">
-            <!-- Old tomoni -->
             <div class="card-front absolute inset-0 bg-slate-950 border border-blue-500/30 rounded-3xl p-6 flex flex-col items-center justify-between text-center shadow-xl">
               <span class="text-xs uppercase font-extrabold text-blue-400 tracking-wider">Old tomoni (Bosganda aylanadi)</span>
               <div>
@@ -488,7 +467,6 @@
               </div>
               <p class="text-[11px] text-slate-500">Orqaga o'girish uchun kartani bosing</p>
             </div>
-            <!-- Orqa tomoni -->
             <div class="card-back absolute inset-0 bg-slate-950 border border-emerald-500/30 rounded-3xl p-6 flex flex-col justify-between text-left shadow-xl">
               <span class="text-xs uppercase font-extrabold text-emerald-400 tracking-wider">Ta'rif va Asl Kontekst</span>
               <div class="space-y-3">
@@ -525,7 +503,7 @@
       renderGame();
     }
 
-    // 2. Multiple Choice (4 variant)
+    // 2. Multiple Choice
     function renderMultipleChoice(stage, stats) {
       const item = vocabularyDeck[gameIndex % vocabularyDeck.length];
       stats.innerText = `Savol: ${gameIndex + 1} / ${vocabularyDeck.length} | Ball: ${score}`;
@@ -562,7 +540,7 @@
       renderGame();
     }
 
-    // 3. Matching Pairs (6x6 Juftlik)
+    // 3. Matching Pairs
     let selectedMatch = null;
     function renderMatching(stage, stats) {
       stats.innerText = `Juftliklar o'yini`;
@@ -596,12 +574,10 @@
         selectedMatch = { btn, id, type };
       } else {
         if (selectedMatch.type !== type && selectedMatch.id === id) {
-          // To'g'ri juftlik
           playTone(800, 'sine', 0.2);
           btn.classList.add('matched', 'opacity-0', 'pointer-events-none');
           selectedMatch.btn.classList.add('matched', 'opacity-0', 'pointer-events-none');
         } else {
-          // Xato
           playTone(180, 'sawtooth', 0.2);
           const first = selectedMatch.btn;
           setTimeout(() => {
@@ -613,7 +589,7 @@
       }
     }
 
-    // 4. Fill the Gap (Kontekst to'ldirish)
+    // 4. Fill the Gap
     function renderFillGap(stage, stats) {
       const item = vocabularyDeck[gameIndex % vocabularyDeck.length];
       stats.innerText = `Mashq: ${gameIndex + 1} / ${vocabularyDeck.length}`;
@@ -651,7 +627,7 @@
       renderGame();
     }
 
-    // 5. Word Rush (60s Poyga)
+    // 5. Word Rush
     let rushTime = 60;
     function renderWordRush(stage, stats) {
       rushTime = 60;
@@ -663,7 +639,7 @@
         if (timerEl) timerEl.innerText = `${rushTime}s`;
         if (rushTime <= 0) {
           clearInterval(timerInterval);
-          alert(`Vaqt tugadi! Sizning yakuniy ochkongiz: ${score}`);
+          alert(`Vaqt tugadi! Sizning ochkongiz: ${score}`);
           closeGameArena();
         }
       }, 1000);
@@ -696,11 +672,11 @@
 
     function answerRush(userAnswerCorrect) {
       if (userAnswerCorrect) {
-        rushTime += 1; // +1 soniya qo'shiladi
+        rushTime += 1;
         score += 10;
         playTone(800, 'sine', 0.1);
       } else {
-        rushTime = Math.max(0, rushTime - 3); // -3 soniya jarima
+        rushTime = Math.max(0, rushTime - 3);
         playTone(180, 'sawtooth', 0.2);
       }
       const scoreEl = document.getElementById('rush-score');
@@ -708,7 +684,7 @@
       nextRushQuestion(document.getElementById('game-stage'));
     }
 
-    // 6. Typing Race (Vaqtga qarshi terish)
+    // 6. Typing Race
     function renderTypingRace(stage, stats) {
       const item = vocabularyDeck[gameIndex % vocabularyDeck.length];
       stats.innerText = `So'z: ${gameIndex + 1} / ${vocabularyDeck.length}`;
@@ -738,7 +714,7 @@
       }
     }
 
-    // 7. Sentence Builder (Sintaktik gap tuzuvchi)
+    // 7. Sentence Builder
     let builtTokens = [];
     function renderSentenceBuilder(stage, stats) {
       const item = vocabularyDeck[gameIndex % vocabularyDeck.length];
@@ -755,10 +731,8 @@
             <p class="text-xs text-slate-400 mt-1">So'zlarni bosib ketma-ket joylashtiring</p>
           </div>
 
-          <!-- Yig'ilgan bloklar -->
           <div id="built-zone" class="min-h-[60px] p-4 bg-slate-950 border border-fuchsia-500/30 rounded-2xl flex flex-wrap gap-2 items-center"></div>
 
-          <!-- So'z bo'laklari -->
           <div id="source-zone" class="flex flex-wrap gap-2 justify-center">
             ${shuffled.map((tok, i) => `
               <button onclick="pickToken(this, '${tok}')" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold rounded-xl text-slate-200 transition">
@@ -803,20 +777,48 @@
     }
 
     // ==========================================
-    // READING RASM SKANER (AI INTEGRATSIYASI)
+    // READING RASM SKANER (AVTOMATIK SIQISH BILAN)
     // ==========================================
+    function compressImage(file, callback) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 1200;
+
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          callback(canvas.toDataURL('image/jpeg', 0.82));
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
     async function handleImageUpload(e) {
       const file = e.target.files[0];
       if (!file) return;
 
-      const reader = new FileReader();
-      reader.onload = async function(event) {
-        const base64Data = event.target.result;
+      document.getElementById('scan-preview-box').classList.remove('hidden');
+      document.getElementById('scan-loading-text').classList.remove('hidden');
 
-        // Ekranda ko'rsatish
-        document.getElementById('scan-preview-box').classList.remove('hidden');
-        document.getElementById('scan-preview-img').src = base64Data;
-        document.getElementById('scan-loading-text').classList.remove('hidden');
+      compressImage(file, async function(optimizedBase64) {
+        document.getElementById('scan-preview-img').src = optimizedBase64;
 
         try {
           const response = await fetch('/api/ai', {
@@ -824,30 +826,32 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               type: 'reading',
-              image: base64Data
+              image: optimizedBase64
             })
           });
 
-          if (!response.ok) throw new Error('Serverda xatolik');
+          const data = await response.json();
 
-          const newWords = await response.json();
-          if (Array.isArray(newWords) && newWords.length > 0) {
-            vocabularyDeck = newWords;
+          if (!response.ok) {
+            throw new Error(data.error || 'Server xatosi');
+          }
+
+          if (Array.isArray(data) && data.length > 0) {
+            vocabularyDeck = data;
             document.getElementById('total-words-badge').innerText = `${vocabularyDeck.length} ta so'z`;
-            alert(`Muvaffaqiyatli! Matndan ${newWords.length} ta B2/C1 darajadagi so'zlar ajratib olindi va barcha 7 ta o'yinga yuklandi!`);
+            alert(`Ajoyib! Matndan ${data.length} ta B2/C1 darajadagi so'zlar ajratib olindi va 7 ta mini-o'yinga yuklandi!`);
             switchTab('vocab');
           }
         } catch (err) {
-          alert('Rasmni skaner qilishda xatolik yuz berdi. Vercel sozlamalarida GEMINI_API_KEY o\'rnatilganini tekshiring.');
+          alert('Xatolik: ' + err.message);
         } finally {
           document.getElementById('scan-loading-text').classList.add('hidden');
         }
-      };
-      reader.readAsDataURL(file);
+      });
     }
 
     // ==========================================
-    // SPEAKING WITH MAYA (OVOZ VA BAHOLASH)
+    // SPEAKING WITH MAYA
     // ==========================================
     let recognition = null;
     let isRecording = false;
@@ -874,7 +878,7 @@
 
     function toggleRecording() {
       if (!recognition) {
-        alert("Brauzeringiz ovozni aniqlashni qo'llab-quvvatlamaydi (Google Chrome tavsiya etiladi).");
+        alert("Brauzeringiz ovozni qo'llab-quvvatlamaydi (Google Chrome tavsiya etiladi).");
         return;
       }
       if (!isRecording) {
@@ -893,50 +897,3 @@
         isRecording = false;
         document.getElementById('mic-btn').classList.remove('animate-pulse', 'ring-4', 'ring-rose-500');
         document.getElementById('mic-status').innerText = "Ovoz yozildi. Baholash tugmasini bosing";
-      }
-    }
-
-    async function submitSpeechAnswer() {
-      const question = document.getElementById('speaking-question').innerText;
-      const answer = document.getElementById('speech-transcript').value.trim();
-
-      if (!answer) {
-        alert("Iltimos, avval mikrofon orqali gapiring yoki javobingizni yozing!");
-        return;
-      }
-
-      const btn = document.getElementById('submit-speech-btn');
-      btn.innerText = "Maya tahlil qilmoqda...";
-      btn.disabled = true;
-
-      try {
-        const response = await fetch('/api/ai', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            type: 'speaking',
-            question: question,
-            answer: answer
-          })
-        });
-
-        if (!response.ok) throw new Error('Server xatosi');
-
-        const result = await response.json();
-
-        // Natijani ko'rsatish
-        document.getElementById('maya-feedback-box').classList.remove('hidden');
-        document.getElementById('maya-band').innerText = `Band ${result.band}`;
-        document.getElementById('maya-comment').innerText = result.feedback;
-        document.getElementById('maya-rephrase').innerText = `"${result.native_rephrase}"`;
-
-      } catch (err) {
-        alert("Baholashda xatolik yuz berdi. GEMINI_API_KEY ulanganini tekshiring.");
-      } finally {
-        btn.innerText = "Javobni Mayaga Yuborish & Baholash";
-        btn.disabled = false;
-      }
-    }
-  </script>
-</body>
-</html>
