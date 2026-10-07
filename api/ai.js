@@ -13,7 +13,7 @@ export default async function handler(req, res) {
 
   const rawKey = process.env.GEMINI_API_KEY;
   if (!rawKey) {
-    return res.status(500).json({ error: 'Vercel sozlamalarida GEMINI_API_KEY topilmadi' });
+    return res.status(500).json({ error: 'GEMINI_API_KEY topilmadi' });
   }
   const apiKey = rawKey.trim().replace(/^["']|["']$/g, '');
 
@@ -91,21 +91,14 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Noto\'g\'ri so\'rov turi' });
     }
 
-    // Navbat bilan sinab ko'riladigan zaxira modellar ro'yxati
-    const fallbackModels = [
-      'gemini-3.8-flash',
-      'gemini-2.5-flash',
-      'gemini-2.0-flash',
-      'gemini-1.5-flash-latest',
-      'gemini-pro'
-    ];
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
 
+    // High demand bo'lsa avtomatik 3 martagacha qayta urunish (Retry)
     let lastError = null;
+    const maxRetries = 3;
 
-    // Agar modelda "high demand" yoki yuklama bo'lsa, zaxiradagisiga avtomatik o'tadi
-    for (const model of fallbackModels) {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
         const response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -114,22 +107,28 @@ export default async function handler(req, res) {
 
         const data = await response.json();
 
-        // Agar so'rov muvaffaqiyatli o'tsa va natija kelsa
-        if (response.ok && data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+        if (response.ok && data?.candidates?.[0]?.content?.parts?.[0]?.text) {
           const rawText = data.candidates[0].content.parts[0].text;
           const cleanJson = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
           const result = JSON.parse(cleanJson);
           return res.status(200).json(result);
         }
 
-        // Xatolik xabarini qayd qilamiz va keyingi modelga o'tamiz
-        lastError = data?.error?.message || `Model (${model}) javob bermadi`;
+        lastError = data?.error?.message || `Server javob bermadi (${response.status})`;
+
+        // Agar server band bo'lsa (high demand), 1.5 soniya kutib qayta yuboradi
+        if (attempt < maxRetries) {
+          await new Promise(res => setTimeout(res, 1500));
+        }
       } catch (err) {
         lastError = err.message;
+        if (attempt < maxRetries) {
+          await new Promise(res => setTimeout(res, 1500));
+        }
       }
     }
 
-    return res.status(500).json({ error: lastError || 'Barcha AI serverlarda yuklama yuqori, birozdan so\'ng qayta urining' });
+    return res.status(500).json({ error: lastError || 'AI server band, qayta urining' });
 
   } catch (error) {
     return res.status(500).json({ error: error.message });
