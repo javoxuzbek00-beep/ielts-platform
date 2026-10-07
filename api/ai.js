@@ -4,10 +4,10 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Faqat POST qabul qilinadi' });
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Faqat POST so\'rovlar qabul qilinadi' });
 
   const rawKey = process.env.GEMINI_API_KEY;
-  if (!rawKey) return res.status(500).json({ error: 'GEMINI_API_KEY topilmadi' });
+  if (!rawKey) return res.status(500).json({ error: 'Vercel sozlamalarida GEMINI_API_KEY topilmadi' });
   const apiKey = rawKey.trim().replace(/^["']|["']$/g, '');
 
   const { image } = req.body;
@@ -23,29 +23,23 @@ export default async function handler(req, res) {
     }
 
     const prompt = `
-      You are an expert Cambridge IELTS Academic trainer.
-      Analyze this Reading passage page image with extreme precision:
-      1. Determine the main theme of the text and create a concise, professional, punchy topic title in CAPITAL LETTERS (e.g., "WEANING & INFANT DIET", "URBAN SPRAWL & INFRASTRUCTURE", "BIOMIMETICS IN MODERN DESIGN").
-      2. Extract AT LEAST 10 to 15 of the most crucial B2/C1 academic vocabulary words or collocations from the text.
-      3. For each word, provide:
-         - exact word/phrase
-         - accurate IPA phonetic transcription
-         - clear definition in English
-         - exact, accurate Uzbek translation
-         - authentic context sentence directly from the reading text
-         - 3 plausible but incorrect Uzbek distractors for quizzes.
+      You are an expert Cambridge IELTS Academic teacher.
+      Analyze this Reading passage page image:
+      1. Create a short, relevant TOPIC TITLE in CAPITAL LETTERS based on the passage (e.g. "WEANING & INFANT DIET", "URBAN MIGRATION").
+      2. Extract 10 to 14 essential B2/C1 academic vocabulary words or collocations from this text.
+      3. For each word give: word, IPA phonetic, English meaning, Uzbek meaning, exact sentence from the text, and 3 Uzbek distractors.
 
-      Return ONLY a raw JSON object with this exact schema:
+      Respond ONLY with valid JSON using this format:
       {
-        "title": "CAPITALIZED TOPIC TITLE",
+        "title": "TOPIC TITLE",
         "words": [
           {
-            "word": "mitigate",
-            "phonetic": "/ˈmɪtɪɡeɪt/",
-            "en_meaning": "To make something less severe, serious, or painful",
-            "uz_meaning": "yumshatmoq, ta'sirini kamaytirmoq",
-            "context_sentence": "The council took urgent measures to mitigate environmental hazards.",
-            "distractors": ["kuchaytirmoq", "paydo qilmoq", "yo'qotib yubormoq"]
+            "word": "example",
+            "phonetic": "/ɪɡˈzɑːmpl/",
+            "en_meaning": "a representative form or pattern",
+            "uz_meaning": "namuna, misol",
+            "context_sentence": "This is an authentic sentence from the text.",
+            "distractors": ["variant 1", "variant 2", "variant 3"]
           }
         ]
       }
@@ -59,20 +53,20 @@ export default async function handler(req, res) {
           { inlineData: { mimeType: mimeType, data: cleanBase64 } }
         ]
       }],
-      generationConfig: { responseMimeType: "application/json" }
+      generationConfig: {
+        responseMimeType: "application/json",
+        temperature: 0.2
+      }
     };
 
-    const modelsChain = [
-      'gemini-3.8-flash',
-      'gemini-3.1-flash-lite',
-      'gemini-3.7-flash',
-      'gemini-3-flash-preview'
-    ];
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
 
     let lastError = null;
-    for (const model of modelsChain) {
+    const maxRetries = 3;
+
+    // High demand bo'lsa 3 martagacha avtomatik qayta so'rov yuborish
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
         const response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -80,24 +74,51 @@ export default async function handler(req, res) {
         });
 
         const data = await response.json();
+
         if (response.ok && data?.candidates?.[0]?.content?.parts?.[0]?.text) {
           const rawText = data.candidates[0].content.parts[0].text;
-          const cleanJson = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
-          return res.status(200).json(JSON.parse(cleanJson));
+          
+          // Aqlli JSON tozalash va o'qish (Hech qachon xato bermaydi)
+          let parsedData = null;
+          try {
+            parsedData = JSON.parse(rawText);
+          } catch (_) {
+            const jsonMatch = rawText.match(/\{[\s\S]*\}|\[[\s\S]*\]/);
+            if (jsonMatch) {
+              parsedData = JSON.parse(jsonMatch[0]);
+            }
+          }
+
+          if (parsedData) {
+            // Agar model shunchaki massiv qaytarsa ham moslab beramiz
+            if (Array.isArray(parsedData)) {
+              return res.status(200).json({
+                title: "IELTS READING PASSAGE",
+                words: parsedData
+              });
+            }
+            return res.status(200).json(parsedData);
+          }
         }
 
-        const msg = data?.error?.message || '';
+        const msg = data?.error?.message || `Server javob bermadi (${response.status})`;
         lastError = msg;
-        if (msg.includes('high demand') || msg.includes('overloaded') || response.status === 503 || response.status === 404) {
-          continue;
+
+        // Agar server band bo'lsa (high demand), biroz kutib yana urunadi
+        if (attempt < maxRetries) {
+          await new Promise(r => setTimeout(r, 1500 * attempt));
         }
       } catch (err) {
         lastError = err.message;
+        if (attempt < maxRetries) {
+          await new Promise(r => setTimeout(r, 1500 * attempt));
+        }
       }
     }
 
-    return res.status(500).json({ error: lastError || 'AI serverlarida yuklama yuqori, qayta urining' });
+    return res.status(500).json({ error: lastError || 'AI javob bermadi, qayta urinib ko\'ring' });
+
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: 'Server xatosi: ' + error.message });
   }
 }
