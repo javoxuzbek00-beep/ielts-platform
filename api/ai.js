@@ -91,29 +91,45 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Noto\'g\'ri so\'rov turi' });
     }
 
-    // Google xabarida so'ralgan rasmiy model: gemini-3.8-flash
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
+    // Navbat bilan sinab ko'riladigan zaxira modellar ro'yxati
+    const fallbackModels = [
+      'gemini-3.8-flash',
+      'gemini-2.5-flash',
+      'gemini-2.0-flash',
+      'gemini-1.5-flash-latest',
+      'gemini-pro'
+    ];
 
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+    let lastError = null;
 
-    const data = await response.json();
+    // Agar modelda "high demand" yoki yuklama bo'lsa, zaxiradagisiga avtomatik o'tadi
+    for (const model of fallbackModels) {
+      try {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
 
-    if (!response.ok || data.error) {
-      return res.status(500).json({ error: data?.error?.message || 'Gemini xatoligi' });
+        const data = await response.json();
+
+        // Agar so'rov muvaffaqiyatli o'tsa va natija kelsa
+        if (response.ok && data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+          const rawText = data.candidates[0].content.parts[0].text;
+          const cleanJson = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
+          const result = JSON.parse(cleanJson);
+          return res.status(200).json(result);
+        }
+
+        // Xatolik xabarini qayd qilamiz va keyingi modelga o'tamiz
+        lastError = data?.error?.message || `Model (${model}) javob bermadi`;
+      } catch (err) {
+        lastError = err.message;
+      }
     }
 
-    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!rawText) {
-      return res.status(500).json({ error: 'AI javob qaytara olmadi' });
-    }
-
-    const cleanJson = rawText.replace(/```json/gi, '').replace(/```/g, '').trim();
-    const result = JSON.parse(cleanJson);
-    return res.status(200).json(result);
+    return res.status(500).json({ error: lastError || 'Barcha AI serverlarda yuklama yuqori, birozdan so\'ng qayta urining' });
 
   } catch (error) {
     return res.status(500).json({ error: error.message });
